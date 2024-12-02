@@ -4,6 +4,18 @@
 #include <via65c22.h>
 #include <cpu6502.h>
 
+void bin(unsigned char  n) {
+    unsigned char i;
+    printf("0");
+    for (i = 1 << 7; i > 0; i = i / 2) {
+        if ((n & i) != 0) {
+            printf("1");
+        }
+        else {
+            printf("0");
+        }
+    }
+}
 int main(int argc, char * argv[]) {
     init_bus();
 
@@ -20,10 +32,12 @@ int main(int argc, char * argv[]) {
 
     // run 100 instructions;
 
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 0xFFFF; i++) {
         run_instr();
         unsigned char via_b = out_b();
-        printf("VIA REGISTER B: 0x%02x\n", (int)via_b);
+        printf("VIA REGISTER B: ");
+        bin(via_b);
+        printf("\n");
     }
 
     eeprom_deinit();

@@ -50,21 +50,32 @@ void JMP_A() {
     ADDR addr;
     abs_a(&addr, 0);
     pc.p = addr.p;
-    printf("JMP $%x\n", addr.p);
+    //printf("JMP $%x\n", addr.p);
+}
+
+void RORA() {
+    unsigned char carry = A & 0b1;
+    A = A >> 1;
+    A = (C << 7) + A;
+    C = carry;
+    //printf("ROR (A) %x\n", A);
+    clock();
+    clock();
+    pc.p++;
 }
 
 void STA_A() {
     ADDR addr;
     abs_a(&addr, 1);
     bus_write_data(addr.p, A);
-    printf("STA $%x\n", addr.p);
+    //printf("STA $%x\n", addr.p);
 }
 
 void LDA_IMM() {
     unsigned char val;
     imm(&val);
     A = val;
-    printf("LDA #(%x)\n", val);
+    //printf("LDA #(%x)\n", val);
 }
 
 
@@ -73,7 +84,7 @@ void NOP() {
     clock();
     clock();
     pc.p++;
-    printf("NOP\n");
+    //printf("NOP\n");
 }
 
 void interrupt() {
@@ -85,7 +96,8 @@ void non_maskable_interrupt() {
 }
 
 void clock() {
-    usleep(1);
+    // usleep(1);
+    usleep(100000);
 }
 
 void reset() {
@@ -118,6 +130,9 @@ void run_instr() {
     switch (instr) {
     case 0x4C:
         JMP_A();
+        break;
+    case 0x6A:
+        RORA();
         break;
     case 0x8D:
         STA_A();
