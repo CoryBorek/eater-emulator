@@ -37,7 +37,7 @@ int main(int argc, char * argv[]) {
         unsigned char via_b = out_b();
         printf("VIA REGISTER B: ");
         bin(via_b);
-        printf("\n");
+        printf(" %c\n", (char)via_b);
     }
 
     eeprom_deinit();
