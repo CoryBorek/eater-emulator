@@ -1,6 +1,16 @@
 #include <stdio.h>
+#include <bus.h>
+#include <cpu6502.h>
 
 int main(int argc, char * argv[]) {
-    printf("Hello, world!\n");
-    return 0;
+    init_bus();
+    reset();
+
+    // run 100 instructions;
+
+    for (int i = 0; i < 5; i++) {
+        run_instr();
+    }
+
+    printf("done!\n");
 }
