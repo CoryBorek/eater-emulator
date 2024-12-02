@@ -96,8 +96,8 @@ void non_maskable_interrupt() {
 }
 
 void clock() {
-    // usleep(1);
-    usleep(100000);
+    //usleep(1);
+    usleep(10000);
 }
 
 void reset() {

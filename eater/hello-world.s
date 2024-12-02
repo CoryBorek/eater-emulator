@@ -50,7 +50,155 @@ reset:
   lda #0         ; Clear RS/RW/E bits
   sta PORTA
 
+  lda #%00000001 ; Clear display
+  sta PORTB
+  
+  lda #0         ; Clear RS/RW/E bits
+  sta PORTA
+  
+  lda #E         ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #0         ; Clear RS/RW/E bits
+  sta PORTA
+
   lda #"H"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #"e"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #"l"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #"l"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #"o"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #","    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #" "    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #"W"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+  lda #"o"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+
+  lda #"r"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+	
+  lda #"l"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+
+  lda #"d"    
+  sta PORTB
+  
+  lda #RS        ; Set RS
+  sta PORTA
+  
+  lda #(RS | E)  ; Set E bit to send instruction
+  sta PORTA
+  
+  lda #RS        ; Clear Enable
+  sta PORTA
+
+  lda #"!"    
   sta PORTB
   
   lda #RS        ; Set RS

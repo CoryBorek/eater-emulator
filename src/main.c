@@ -3,6 +3,7 @@
 #include <eeprom26c256.h>
 #include <via65c22.h>
 #include <cpu6502.h>
+#include <HD44780U.h>
 
 void bin(unsigned char  n) {
     unsigned char i;
@@ -16,6 +17,7 @@ void bin(unsigned char  n) {
         }
     }
 }
+
 int main(int argc, char * argv[]) {
     init_bus();
 
@@ -34,10 +36,12 @@ int main(int argc, char * argv[]) {
 
     for (int i = 0; i < 0xFFFF; i++) {
         run_instr();
-        unsigned char via_b = out_b();
-        printf("VIA REGISTER B: ");
-        bin(via_b);
-        printf(" %c\n", (char)via_b);
+        print_display();
+        //unsigned char via_b = out_b();
+        //printf("VIA REGISTER B: ");
+        //bin(via_b);
+        //printf(" %c\n", (char)via_b);
+        //display_read_instruction();
     }
 
     eeprom_deinit();
