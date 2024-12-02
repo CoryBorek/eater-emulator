@@ -10,11 +10,11 @@ OBJS =	obj/via65c22.o \
 
 .PHONY: all clean
 
-all: main
+all: $(TARGET_DIR)/emu
 
-$(TARGET_DIR)/main: src/main.c $(OBJS)
-	@$(CC) $(CARGS) -o $(TARGET_DIR)/main $(OBJS) src/main.c
-	@echo Created $(TARGET_DIR)/main
+$(TARGET_DIR)/emu: src/main.c $(OBJS)
+	@$(CC) $(CARGS) -o $@ $(OBJS) src/main.c
+	@echo Created $@
 
 obj/%.o: src/%.c
 	@mkdir -p obj
@@ -23,5 +23,5 @@ obj/%.o: src/%.c
 
 clean:
 	@rm -rf obj
-	@rm -rf $(TARGET_DIR)/main
+	@rm -rf $(TARGET_DIR)/emu
 	@echo Cleaned!
