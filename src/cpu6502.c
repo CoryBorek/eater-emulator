@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <bus.h>
-
+#include <stdlib.h>
 // accumulator, x and y registers/
 unsigned char A, X, Y;
 
@@ -144,8 +144,8 @@ void run_instr() {
         NOP();
         break;
     default:
-        printf("Unknown instruction: %x. Acting as NOP\n", instr);
-        NOP();
+        printf("Unknown instruction: %x. Exiting.", instr);
+        exit(1);
         break;
     }
 }
