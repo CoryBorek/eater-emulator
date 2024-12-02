@@ -2,7 +2,9 @@
 TARGET_DIR ?= .
 CC? = gcc
 CARGS= -Wall -Iinclude
-OBJS =  obj/bus.o \
+OBJS =	obj/via65c22.o \
+	obj/bus.o \
+	obj/eeprom26c256.o \
 	obj/cpu6502.o
 
 .PHONY: all clean

@@ -33,10 +33,41 @@ void abs_a(ADDR* addr, int extra) {
     unsigned char h_f = pc.s.h;
 
     if (h_f != h_i || extra) {
-        printf("page different\n");
+        //printf("page different\n");
         clock();
     }
 }
+
+void imm(unsigned char* val) {
+    clock();
+    pc.p++;
+    *val = bus_read_data(pc.p);
+    clock();
+    pc.p++;
+}
+
+void JMP_A() {
+    ADDR addr;
+    abs_a(&addr, 0);
+    pc.p = addr.p;
+    printf("JMP $%x\n", addr.p);
+}
+
+void STA_A() {
+    ADDR addr;
+    abs_a(&addr, 1);
+    bus_write_data(addr.p, A);
+    printf("STA $%x\n", addr.p);
+}
+
+void LDA_IMM() {
+    unsigned char val;
+    imm(&val);
+    A = val;
+    printf("LDA #(%x)\n", val);
+}
+
+
 
 void NOP() {
     clock();
@@ -85,8 +116,20 @@ void reset() {
 void run_instr() {
     unsigned char instr = bus_read_data(pc.p);
     switch (instr) {
+    case 0x4C:
+        JMP_A();
+        break;
+    case 0x8D:
+        STA_A();
+        break;
+    case 0xA9:
+        LDA_IMM();
+        break;
     case 0xEA:
+        NOP();
+        break;
     default:
+        printf("Unknown instruction: %x. Acting as NOP\n", instr);
         NOP();
         break;
     }
