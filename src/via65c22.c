@@ -1,5 +1,6 @@
 #include <via65c22.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 unsigned char DDRA;
 unsigned char DDRB;
@@ -22,6 +23,8 @@ void via_write(unsigned char reg, unsigned char data) {
         DDRA = data;
         break;
     default:
+        printf("Unknown VIA write: %d, %x\n", reg, data);
+        exit(0);
         break;
     }
 }
@@ -41,9 +44,11 @@ unsigned char via_read(unsigned char reg) {
         return DDRA;
         break;
     default:
-        return 0;
+        printf("Unknown VIA read: %d\n", reg);
+        exit(0);
         break;
     }
+    return 0;
 }
 
 

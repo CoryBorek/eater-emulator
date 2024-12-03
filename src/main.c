@@ -4,7 +4,7 @@
 #include <via65c22.h>
 #include <cpu6502.h>
 #include <HD44780U.h>
-
+#include <ram.h>
 void bin(unsigned char  n) {
     unsigned char i;
     printf("0");
@@ -20,6 +20,7 @@ void bin(unsigned char  n) {
 
 int main(int argc, char * argv[]) {
     init_bus();
+    init_ram(0x00, 0x4000);
 
     if (argc > 1) {
         FILE * fptr;
@@ -33,8 +34,8 @@ int main(int argc, char * argv[]) {
     reset();
 
     // run 100 instructions;
-
-    for (int i = 0; i < 0xFFFF; i++) {
+    int run = 1;
+    while(run) {
         run_instr();
         print_display();
         //unsigned char via_b = out_b();

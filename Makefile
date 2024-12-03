@@ -5,6 +5,7 @@ CARGS= -Wall -Iinclude
 OBJS =	obj/via65c22.o \
 	obj/HD44870U.o \
 	obj/bus.o \
+	obj/ram.o \
 	obj/eeprom26c256.o \
 	obj/cpu6502.o
 
