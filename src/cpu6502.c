@@ -43,6 +43,26 @@ void abs_a(ADDR* addr, int extra) {
     }
 }
 
+void abs_x(ADDR* addr, int extra) {
+    unsigned char h_i = pc.s.h;
+    clock();
+    pc.p++;
+    addr->c[0] = bus_read_data(pc.p);
+    clock();
+    pc.p++;
+    addr->c[1] = bus_read_data(pc.p);
+    clock();
+    addr->p += (char)X;
+    clock();
+    pc.p++;
+    unsigned char h_f = pc.s.h;
+
+    if (h_f != h_i) {
+        //printf("page different\n");
+        clock();
+    }
+}
+
 void imm(unsigned char* val) {
     clock();
     pc.p++;
@@ -153,6 +173,16 @@ void STA_A() {
     printf("STA $%x\n", addr.p);
 #endif
 }
+void LDX_IMM() {
+    unsigned char val;
+    imm(&val);
+    X = val;
+    N = (((X >> 7) & 0b1) == 1) ? 1 : 0;
+    Z = X == 0 ? 1 : 0;
+#ifdef DEBUG
+   printf("LDX #(%x)\n", val);
+#endif
+}
 
 void LDA_IMM() {
     unsigned char val;
@@ -163,9 +193,17 @@ void LDA_IMM() {
 #ifdef DEBUG
    printf("LDA #(%x)\n", val);
 #endif
-
 }
-
+void LDA_AX() {
+    ADDR addr;
+    abs_x(&addr, 0);
+    A = bus_read_data(addr.p);    
+    N = (((A >> 7) & 0b1) == 1) ? 1 : 0;
+    Z = A == 0 ? 1 : 0;
+#ifdef DEBUG
+    printf("LDA $(%x),%x\n", addr.p, X);
+#endif
+}
 void LDA_A() {
     ADDR addr;
     abs_a(&addr, 1);
@@ -202,6 +240,16 @@ void BNE() {
 #endif
 }
 
+void INX() {
+    X++;
+    clock();
+    clock();
+    pc.p++;
+#ifdef DEBUG
+    printf("INX\n");
+#endif
+
+}
 void NOP() {
     clock();
     clock();
@@ -301,14 +349,23 @@ void run_instr() {
     case 0x8D:
         STA_A();
         break;
+    case 0xA2:
+        LDX_IMM();
+        break;
     case 0xAD:
         LDA_A();
         break;
     case 0xA9:
         LDA_IMM();
         break;
+    case 0xBD:
+        LDA_AX();
+        break;
     case 0xD0:
         BNE();
+        break;
+    case 0xE8:
+        INX();
         break;
     case 0xEA:
         NOP();
