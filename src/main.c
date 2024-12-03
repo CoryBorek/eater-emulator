@@ -5,6 +5,8 @@
 #include <cpu6502.h>
 #include <HD44780U.h>
 #include <ram.h>
+#include <modes.h>
+
 void bin(unsigned char  n) {
     unsigned char i;
     printf("0");
@@ -21,7 +23,7 @@ void bin(unsigned char  n) {
 int main(int argc, char * argv[]) {
     init_bus();
     init_ram(0x00, 0x4000);
-
+    set_clock_speed(1);
     if (argc > 1) {
         FILE * fptr;
         fptr = fopen(argv[1], "r");

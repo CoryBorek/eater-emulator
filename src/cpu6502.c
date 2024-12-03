@@ -3,7 +3,8 @@
 #include <unistd.h>
 #include <bus.h>
 #include <stdlib.h>
-
+#include <string.h>
+#include <modes.h>
 //#define DEBUG
 // accumulator, x and y registers/
 unsigned char A, X, Y;
@@ -24,6 +25,12 @@ ADDR pc;
 
 // Status register
 unsigned char N, V, B, D, O, Z, C;
+
+char last_instr[16] = {0}; 
+
+char * get_last_instr() {
+    return last_instr;
+}
 
 void abs_a(ADDR* addr, int extra) {
     unsigned char h_i = pc.s.h;
@@ -99,6 +106,7 @@ void CLC() {
 #ifdef DEBUG
    printf("CLC\n");
 #endif
+   strcpy(last_instr, "CLC");
 }
 
 void ORA_A() {
@@ -112,6 +120,7 @@ void ORA_A() {
 #ifdef DEBUG
      printf("ORA %x %x\n", val, A);
 #endif
+     strcpy(last_instr, "ORA");
 }
 
 void JSR() {
@@ -128,6 +137,7 @@ void JSR() {
      pc.p = addr.p;
      clock();
      clock();
+     strcpy(last_instr, "JSR");
 }
 
 void ANDI() {
@@ -139,7 +149,7 @@ void ANDI() {
 #ifdef DEBUG
    printf("AND %x\n", A);
 #endif
-
+   strcpy(last_instr, "AND");
 }
 
 void ROLA() {
@@ -159,6 +169,7 @@ void ROLA() {
 #ifdef DEBUG
    printf("ROL $(%x)\n", addr.p);
 #endif
+   strcpy(last_instr, "ROL");
 }
 
 void SEC() {
@@ -169,6 +180,7 @@ void SEC() {
 #ifdef DEBUG
    printf("SEC\n");
 #endif
+   strcpy(last_instr, "SEC");
 }
 
 void PHA() {
@@ -181,6 +193,7 @@ void PHA() {
     clock();
     clock();
     pc.p++;
+    strcpy(last_instr, "PHA");
 }
 
 void RTS() {
@@ -194,6 +207,7 @@ void RTS() {
 #ifdef DEBUG
      printf("RTS\n");
 #endif
+     strcpy(last_instr, "RTS");
 }
 void JMP_A() {
     ADDR addr;
@@ -202,6 +216,7 @@ void JMP_A() {
 #ifdef DEBUG
      printf("JMP $%x\n", addr.p);
 #endif
+     strcpy(last_instr, "JMP");
 }
 
 void PLA() {
@@ -219,6 +234,7 @@ void PLA() {
     clock();
     clock();
     pc.p++;
+    strcpy(last_instr, "PLA");
 }
 
 void ADC_IMM() {
@@ -242,6 +258,7 @@ void ADC_IMM() {
     N = (temp >> 7) & 0b1;
     Z = temp == 0 ? 1 : 0;
     V = (of == 1 && ((val >> 7) & 0b1) != N) ? 1 : 0;
+    strcpy(last_instr, "ADC");
 }
 
 void RORA() {
@@ -257,6 +274,7 @@ void RORA() {
     clock();
     clock();
     pc.p++;
+    strcpy(last_instr, "ROR");
 }
 
 void TXA() {
@@ -270,6 +288,7 @@ void TXA() {
 #ifdef DEBUG
    printf("TXA\n");
 #endif
+   strcpy(last_instr, "TXA");
 }
 
 void STY_A() {
@@ -280,6 +299,7 @@ void STY_A() {
 #ifdef DEBUG
     printf("STY $%x\n", addr.p);
 #endif
+    strcpy(last_instr, "STY");
 }
 
 void STA_A() {
@@ -290,6 +310,7 @@ void STA_A() {
 #ifdef DEBUG
     printf("STA $%x\n", addr.p);
 #endif
+    strcpy(last_instr, "STA");
 }
 
 
@@ -315,6 +336,7 @@ void BCC() {
 #ifdef DEBUG
     printf("BCC %d: %d\n", (char)data, Z);
 #endif
+    strcpy(last_instr, "BCC");
 }
 
 void STA_AY() {
@@ -325,6 +347,7 @@ void STA_AY() {
 #ifdef DEBUG
     printf("STA,Y $%x\n", addr.p);
 #endif
+    strcpy(last_instr, "STA,Y");
 }
 void TXS() {
     sp = X;
@@ -334,6 +357,7 @@ void TXS() {
 #ifdef DEBUG
    printf("TXS\n");
 #endif
+   strcpy(last_instr, "TXS");
 }
 
 void LDY_IMM() {
@@ -345,6 +369,7 @@ void LDY_IMM() {
 #ifdef DEBUG
    printf("LDY #(%x)\n", val);
 #endif
+   strcpy(last_instr, "LDY");
 }
 
 void LDX_IMM() {
@@ -356,6 +381,7 @@ void LDX_IMM() {
 #ifdef DEBUG
    printf("LDX #(%x)\n", val);
 #endif
+   strcpy(last_instr, "LDX");
 }
 
 void LDA_IMM() {
@@ -367,6 +393,7 @@ void LDA_IMM() {
 #ifdef DEBUG
    printf("LDA #(%x)\n", val);
 #endif
+   strcpy(last_instr, "LDA");
 }
 
 void LDA_AY() {
@@ -378,6 +405,7 @@ void LDA_AY() {
 #ifdef DEBUG
     printf("LDA,Y $(%x),%x\n", addr.p, X);
 #endif
+    strcpy(last_instr, "LDA,Y");
 }
 void LDA_AX() {
     ADDR addr;
@@ -388,6 +416,7 @@ void LDA_AX() {
 #ifdef DEBUG
     printf("LDA,X $(%x),%x\n", addr.p, X);
 #endif
+    strcpy(last_instr, "LDA,X");
 }
 
 void INY() {
@@ -397,6 +426,7 @@ void INY() {
     clock();
     clock();
     pc.p++;
+    strcpy(last_instr, "INY");
 }
 void DEX() {
     X--;
@@ -405,6 +435,7 @@ void DEX() {
     clock();
     clock();
     pc.p++;
+    strcpy(last_instr, "DEX");
 }
 
 void LDA_A() {
@@ -416,7 +447,7 @@ void LDA_A() {
 #ifdef DEBUG
    printf("LDA $(%x)\n", addr.p);
 #endif
-
+   strcpy(last_instr, "LDA");
 }
 
 void TAX() {
@@ -430,6 +461,7 @@ void TAX() {
 #ifdef DEBUG
    printf("TAY\n");
 #endif
+   strcpy(last_instr, "TAX");
 }
 void TAY() {
     Y = A;
@@ -442,6 +474,7 @@ void TAY() {
 #ifdef DEBUG
    printf("TAY\n");
 #endif
+   strcpy(last_instr, "TAY");
 }
 
 void BNE() {
@@ -466,6 +499,7 @@ void BNE() {
 #ifdef DEBUG
     printf("BNE %d: %d\n", (char)data, Z);
 #endif
+    strcpy(last_instr, "BNE");
 }
 
 void INX() {
@@ -476,6 +510,7 @@ void INX() {
 #ifdef DEBUG
     printf("INX\n");
 #endif
+    strcpy(last_instr, "INX");
 }
 
 void SBC_IMM() {
@@ -500,6 +535,7 @@ void SBC_IMM() {
     N = (temp >> 7) & 0b1;
     Z = temp == 0 ? 1 : 0;
     V = (of == 1 && ((val >> 7) & 0b1) != N) ? 1 : 0;
+    strcpy(last_instr, "SBC");
 }
     
 void NOP() {
@@ -509,6 +545,7 @@ void NOP() {
 #ifdef DEBUG
    printf("NOP\n");
 #endif
+   strcpy(last_instr, "NOP");
 }
 
 void BEQ() {
@@ -532,6 +569,7 @@ void BEQ() {
 #ifdef DEBUG
     printf("BEQ %x: %d\n", data, Z);
 #endif
+    strcpy(last_instr, "BEQ");
 }
 
 void interrupt() {
@@ -543,8 +581,8 @@ void non_maskable_interrupt() {
 }
 
 void clock() {
-    usleep(1);
-    //usleep(10000);
+    int useconds = get_clock_speed();
+    usleep(useconds);
 }
 
 void reset() {
@@ -572,8 +610,18 @@ void reset() {
     clock();
     pc.c[1] = bus_read_data(0xFFFD);
     clock();
+    strcpy(last_instr, "RESET");
 }
 
+void traceback() {
+    printf("DEBUG DATA: A: %x:%d, X: %X:%d, Y: %X:%d, C: %d, N: %d, Z: %d, V: %d\n", A, A, X,  X, Y, Y, (int)C, (int)N, (int)Z, (int)V);
+    printf("SP: %x\n\n", sp);
+    printf("next 16 bytes in memory: \n");
+    for (unsigned short i = pc.p; i < ((pc.p + 16) < 0xFFFF ? pc.p + 16 : 0xFFFF); i++) {
+        printf("%x ", bus_read_data(i));
+    }
+    printf("\n");
+}
 void run_instr() {
     unsigned char instr = bus_read_data(pc.p);
     switch (instr) {
@@ -678,16 +726,11 @@ void run_instr() {
         break;
     default:
         printf("Unknown instruction: %x at %x. Exiting.\n", instr, pc.p);
-        printf("DEBUG DATA: A: %x:%d, X: %X:%d, Y: %X:%d, C: %d, N: %d, Z: %d, V: %d\n", A, A, X,  X, Y, Y, (int)C, (int)N, (int)Z, (int)V);
-        printf("SP: %x\n\n", sp);
-        printf("next 16 bytes in memory: \n"); {
-            for (unsigned short i = pc.p; i < ((pc.p + 16) < 0xFFFF ? pc.p + 16 : 0xFFFF); i++) {
-                printf("%x ", bus_read_data(i));
-            }
-            printf("\n");
-        }
-        
+        strcpy(last_instr, "ERROR");
+#ifndef NCURSES
+        traceback();
         exit(1);
+#endif
         break;
     }
 }

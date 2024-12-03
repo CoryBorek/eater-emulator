@@ -12,4 +12,8 @@ void clock();
 
 void reset();
 
+char * get_last_instr();
+
+void traceback();
+
 #endif

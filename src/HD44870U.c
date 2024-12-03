@@ -14,6 +14,11 @@
 char DRAM[80] = {0};
 
 
+
+char * get_DRAM() {
+    return DRAM;
+}
+
 int cursor = 0;
 void clear_display() {
     for (int i = 0; i < 80; i++) {
