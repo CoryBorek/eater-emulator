@@ -13,21 +13,12 @@
 
 char DRAM[80] = {0};
 
-char display_line1[18] = {0};
-char display_line2[18] = {0};
 
 int cursor = 0;
 void clear_display() {
-    for (int i = 0; i < 16; i++) {
-        display_line1[i] = ' ';
-        display_line2[i] = ' ';
+    for (int i = 0; i < 80; i++) {
+        DRAM[i] = ' ';
     }
-    display_line1[16] = '\n';
-    display_line2[16] = '\n';
-    
-    display_line1[17] = 0;
-    display_line2[17] = 0;
-    //printf("display cleared!");
 }
 
 void return_home() {
@@ -39,8 +30,14 @@ void cursor_display_shift(unsigned char SC, unsigned char RL) {
 }
 
 void print_display() {
-    printf("%s", display_line1);
-    printf("%s", display_line2);
+    for (int i = 0; i < 16; i++) {
+        printf("%c", DRAM[i]);
+    }
+    printf("\n");
+    for (int i = 41; i < 41 + 16; i++) {
+        printf("%c", DRAM[i]);
+    }
+    printf("\n");
 }
 
 void display_read_instruction() {
@@ -72,8 +69,11 @@ void display_read_instruction() {
                 //F = (b_data >> 2) & 0b1;
             }
         } else if (RS == 1 && RW == 0) {
-            if (cursor < 16) display_line1[cursor] = (char) b_data;
+            DRAM[cursor] = (char) b_data;
             cursor++;
+            if (cursor >= 80) {
+                cursor = 0;
+            }
         } else if (RW == 1 && RS == 0) {
             in_b(0b00000000);
         }
