@@ -41,6 +41,7 @@ struct termios tty;
 
 
 char * file;
+int init = 0;
 void init_acia(char* file_path) {
     file = file_path;
     if (strcmp(file_path, "") == 0) {
@@ -61,7 +62,7 @@ void init_acia(char* file_path) {
     tty.c_lflag &= ~ICANON;
     tty.c_cc[VTIME] = 0;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
     tty.c_cc[VMIN] = 0;
-
+    init = 1;
 }
 
 void deinit_acia() {
@@ -69,10 +70,11 @@ void deinit_acia() {
         return;
     }
     close(serial_port);
+    init = 0;
 }
 
 void acia_write(unsigned char reg, unsigned char data) {
-    
+    if (init == 0) return;
     reg &= 0b11;
     switch (reg) {
     case 0:
@@ -236,6 +238,7 @@ void acia_write(unsigned char reg, unsigned char data) {
 }
 
 unsigned char acia_read(unsigned char reg) {
+    if (init == 0) return 0;
     reg &= 0b11;
     switch (reg) {
     case 0:
