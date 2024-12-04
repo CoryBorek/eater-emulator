@@ -32,12 +32,12 @@ CARGS+=-lncurses -DNCURSES
 endif
 
 # Basic outputs
-.PHONY: all clean
+.PHONY: all eater clean
 
 #
 # Compile the emulator
 #
-all: $(TARGET_DIR)/emu
+all: $(TARGET_DIR)/emu eater
 
 $(TARGET_DIR)/emu: src/$(MODE).c $(OBJS)
 	@$(CC) $(CARGS) -o $@ $(OBJS) src/$(MODE).c
@@ -50,11 +50,16 @@ obj/%.o: src/%.c
 	@mkdir -p obj
 	@$(CC) $(CARGS) -c -o $@ $<
 	@echo CC    $<
-
+#
+# Assembly Sources
+#
+eater:
+	@$(MAKE) -C eater
 #
 # Cleanup
 #
 clean:
 	@rm -rf obj
 	@rm -rf $(TARGET_DIR)/emu
+	@make -C eater clean
 	@echo Cleaned!
