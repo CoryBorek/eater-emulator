@@ -7,7 +7,7 @@ TARGET_DIR ?= .
 #
 # mode can be either main or gui.
 #
-MODE?=gui
+MODE?=main
 
 # C Emulator
 CC? = gcc
@@ -19,6 +19,7 @@ CARGS= -Wall -Iinclude
 OBJS =	obj/modes.o \
 	obj/via65c22.o \
 	obj/HD44870U.o \
+	obj/acia65c51.o \
 	obj/bus.o \
 	obj/ram.o \
 	obj/eeprom26c256.o \

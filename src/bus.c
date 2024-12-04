@@ -2,6 +2,7 @@
 #include <via65c22.h>
 #include <stdio.h>
 #include <HD44780U.h>
+#include <acia65c51.h>
 // TEMPORARY MEMORY;
 unsigned char memory[0x10000];
 char writeable[0x10000];
@@ -14,6 +15,9 @@ void init_bus() {
 }
 
 unsigned char bus_read_data(unsigned short addr) {
+    if (addr >= 0x5000 && addr < 0x6000) {
+        return acia_read(addr & 0xF);
+    }
     if (addr >= 0x6000 && addr < 0x8000) {
         return via_read((unsigned char)(addr & 0xF));
     }
@@ -21,6 +25,10 @@ unsigned char bus_read_data(unsigned short addr) {
 }
 
 void bus_write_data(unsigned short addr, unsigned char data) {
+    if (addr >= 0x5000 && addr < 0x6000) {
+        acia_write(addr & 0xF, data);
+        return;
+    }
     if (addr >= 0x6000 && addr < 0x8000) {
         via_write((unsigned char)(addr & 0xF), data);
         display_read_instruction();

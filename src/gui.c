@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <string.h>
 #include <modes.h>
+#include <acia65c51.h>
 
 void display_center(int yy, char * str)
 {
@@ -28,6 +29,7 @@ void display_center(int yy, char * str)
 }
 
 void char_to_binary_string(char* str, unsigned char n) {
+    
     unsigned char i;
 
     int iter = 0;
@@ -59,9 +61,10 @@ int main(int argc, char * argv[]) {
     display_center(-8, "6502 BE Emulator");
     
     init_bus();
+    
     init_ram(0x00, 0x4000);
     set_clock_speed(1);
-
+    char * acia_file = "";
     if (argc > 1) {
         FILE * fptr;
         fptr = fopen(argv[1], "r");
@@ -70,7 +73,12 @@ int main(int argc, char * argv[]) {
         fread(data, sizeof(data), 1, fptr);
         eeprom_init(data, 0x8000, 0x8000);
         fclose(fptr);
+        if (argc > 2) {
+            acia_file = argv[2];
+        }
     }
+    init_acia(acia_file);
+
     reset();
 
     wtimeout(stdscr, 0);

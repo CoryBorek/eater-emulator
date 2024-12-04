@@ -1,7 +1,7 @@
 #
 # Assembly Arguments
 #
-ASARGS=-Fbin -dotdir
+ASARGS=-Fbin -dotdir -wdc02
 
 #
 # Phony arguments
@@ -11,7 +11,14 @@ ASARGS=-Fbin -dotdir
 #
 # All Assembly files
 #
-FILES ?= blink.bin rom.bin hello-world.bin hello-world-bad.bin number.bin hello-world-final.bin interrupt.bin
+FILES ?= blink.bin \
+	rom.bin \
+	hello-world.bin \
+	hello-world-bad.bin \
+	number.bin \
+	hello-world-final.bin \
+	interrupt.bin \
+	rs232.bin
 
 #
 # Compile everything...

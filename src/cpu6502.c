@@ -605,6 +605,19 @@ void BNE() {
     strcpy(last_instr, "BNE");
 }
 
+void PHX() {
+    bus_write_data(0x100 + sp, X);
+    sp--;
+#ifdef DEBUG
+    printf("PHX %x\n", X);
+#endif
+    clock();
+    clock();
+    clock();
+    pc.p++;
+    strcpy(last_instr, "PHX");
+}
+
 void INX() {
     X++;
     clock();
@@ -690,6 +703,25 @@ void BEQ() {
     printf("BEQ %x: %d\n", data, Z);
 #endif
     strcpy(last_instr, "BEQ");
+}
+
+
+void PLX() {
+    sp++;
+    X = bus_read_data(0x100 + sp);
+    
+#ifdef DEBUG
+    printf("PLX %x\n", A);
+#endif
+    N = (((A >> 7) & 0b1) == 1) ? 1 : 0;
+    Z = A == 0 ? 1 : 0;
+    
+    clock();
+    clock();
+    clock();
+    clock();
+    pc.p++;
+    strcpy(last_instr, "PLX");
 }
 
 void start_interrupt() {
@@ -891,6 +923,9 @@ void run_instr() {
     case 0xD0:
         BNE();
         break;
+    case 0xDA:
+        PHX();
+        break;
     case 0xE8:
         INX();
         break;
@@ -906,6 +941,10 @@ void run_instr() {
     case 0xF0:
         BEQ();
         break;
+    case 0xFA:
+        PLX();
+        break;
+
     default:
         printf("Unknown instruction: %x at %x. Exiting.\n", instr, pc.p);
         strcpy(last_instr, "ERROR");

@@ -6,6 +6,7 @@
 #include <HD44780U.h>
 #include <ram.h>
 #include <modes.h>
+#include <acia65c51.h>
 
 void bin(unsigned char  n) {
     unsigned char i;
@@ -24,7 +25,21 @@ int main(int argc, char * argv[]) {
     init_bus();
     init_ram(0x00, 0x4000);
     set_clock_speed(1);
+    char * acia_file = "";
     if (argc > 1) {
+        FILE * fptr;
+        fptr = fopen(argv[1], "r");
+        unsigned char data[32768];
+        
+        fread(data, sizeof(data), 1, fptr);
+        eeprom_init(data, 0x8000, 0x8000);
+        fclose(fptr);
+        if (argc > 2) {
+            acia_file = argv[2];
+        }
+    }
+    init_acia(acia_file);
+if (argc > 1) {
         FILE * fptr;
         fptr = fopen(argv[1], "r");
         unsigned char data[32768];
@@ -39,9 +54,9 @@ int main(int argc, char * argv[]) {
     int run = 1;
     while(run) {
         run++;
-        if (run == 100) {
+        /*if (run == 100) {
             ca1(0);
-        }
+            }*/
         run_instr();
         print_display();
         //unsigned char via_b = out_b();
