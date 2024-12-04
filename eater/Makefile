@@ -11,7 +11,7 @@ ASARGS=-Fbin -dotdir
 #
 # All Assembly files
 #
-FILES ?= blink.bin rom.bin hello-world.bin hello-world-bad.bin number.bin hello-world-final.bin
+FILES ?= blink.bin rom.bin hello-world.bin hello-world-bad.bin number.bin hello-world-final.bin interrupt.bin
 
 #
 # Compile everything...
@@ -22,7 +22,7 @@ all: vasm6502_oldstyle $(FILES)
 # Compile Assembly files
 #
 %.bin: %.s
-	@./vasm6502_oldstyle $(ASARGS) -o $@ $< > /dev/null
+	./vasm6502_oldstyle $(ASARGS) -o $@ $< > /dev/null
 	@ echo AS    $@
 
 #

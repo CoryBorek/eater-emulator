@@ -38,6 +38,10 @@ int main(int argc, char * argv[]) {
     // run 100 instructions;
     int run = 1;
     while(run) {
+        run++;
+        if (run == 100) {
+            ca1(0);
+        }
         run_instr();
         print_display();
         //unsigned char via_b = out_b();

@@ -13,5 +13,6 @@ void in_a(unsigned char new_a);
 
 void in_b(unsigned char new_b);
 
+void ca1(int val);
 
 #endif

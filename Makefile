@@ -31,6 +31,10 @@ ifeq ($(MODE),gui)
 CARGS+=-lncurses -DNCURSES
 endif
 
+ifeq ($(MODE),main)
+CARGS+= -DDEBUG
+endif
+
 # Basic outputs
 .PHONY: all eater clean
 

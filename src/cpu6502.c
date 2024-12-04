@@ -24,13 +24,15 @@ typedef union {
 ADDR pc;
 
 // Status register
-unsigned char N, V, B, D, O, Z, C;
+unsigned char N, V, B, D, I, Z, C;
 
 char last_instr[16] = {0}; 
 
 char * get_last_instr() {
     return last_instr;
 }
+
+int in_irq = 0;
 
 void abs_a(ADDR* addr, int extra) {
     unsigned char h_i = pc.s.h;
@@ -152,14 +154,30 @@ void ANDI() {
    strcpy(last_instr, "AND");
 }
 
-void ROLA() {
-     ADDR addr;
-     abs_a(&addr, 1);
+void BITA() {
+    ADDR addr;
+    abs_a(&addr, 1);
+    unsigned char val = bus_read_data(addr.p);
+   
+    N = (val >> 7) & 0b1;
+    Z = (A & val) == 0 ? 1 : 0;
+    V = (val >> 6) & 0b1;
 
-     unsigned char value = bus_read_data(addr.p);
-     unsigned char temp = (value >> 7) & 0b1;
-     
-     value = ((value << 1) & 0xFF) + C;
+#ifdef DEBUG
+   printf("BITA %x\n", addr.p);
+#endif
+   strcpy(last_instr, "BIT");
+
+}
+
+void ROLA() {
+    ADDR addr;
+    abs_a(&addr, 1);
+    
+    unsigned char value = bus_read_data(addr.p);
+    unsigned char temp = (value >> 7) & 0b1;
+    
+    value = ((value << 1) & 0xFF) + C;
      C = temp;
      Z = value == 0 ? 1 : 0;
      N = (value >> 7) & 0b1;
@@ -167,9 +185,9 @@ void ROLA() {
      clock();
      clock();
 #ifdef DEBUG
-   printf("ROL $(%x)\n", addr.p);
+     printf("ROL $(%x)\n", addr.p);
 #endif
-   strcpy(last_instr, "ROL");
+     strcpy(last_instr, "ROL");
 }
 
 void SEC() {
@@ -181,6 +199,39 @@ void SEC() {
    printf("SEC\n");
 #endif
    strcpy(last_instr, "SEC");
+}
+
+void RTI() {
+    sp++;
+    unsigned char sr = bus_read_data(0x0100 + sp);
+    C = sr & 0b1;
+    sr = sr >> 1;
+    Z = sr & 0b1;
+    sr = sr >> 1;
+    I = sr & 0b1;
+    sr = sr >> 1;
+    D = sr & 0b1;
+    sr = sr >> 1;
+    sr = sr >> 1;
+    sr = sr >> 1;
+    V = sr & 0b1;
+    sr = sr >> 1;
+    N = sr & 0b1;
+    
+    sp++;
+    pc.c[0] = bus_read_data(0x0100 + sp);
+
+    sp++;
+    pc.c[1] = bus_read_data(0x0100 + sp);
+    
+    for (int i = 0; i < 6; i++) {
+        clock();
+    }
+#ifdef DEBUG
+   printf("RTI\n");
+#endif
+   strcpy(last_instr, "RTI");
+   in_irq = 0;
 }
 
 void PHA() {
@@ -217,6 +268,17 @@ void JMP_A() {
      printf("JMP $%x\n", addr.p);
 #endif
      strcpy(last_instr, "JMP");
+}
+
+void CLI() {
+    I = 0;
+    clock();
+    clock();
+    pc.p++;
+#ifdef DEBUG
+     printf("CLI\n");
+#endif
+     strcpy(last_instr, "CLI");
 }
 
 void PLA() {
@@ -277,6 +339,17 @@ void RORA() {
     strcpy(last_instr, "ROR");
 }
 
+void SEI() {
+    I = 1;
+    clock();
+    clock();
+    pc.p++;
+#ifdef DEBUG
+     printf("SEI\n");
+#endif
+     strcpy(last_instr, "SEI");
+}
+
 void TXA() {
     A = X;
     N = ((A >> 7) & 0b1) == 1 ? 1 : 0;
@@ -289,6 +362,20 @@ void TXA() {
    printf("TXA\n");
 #endif
    strcpy(last_instr, "TXA");
+}
+
+void DEY() {
+    Y--;
+    N = ((Y >> 7) & 0b1) == 1 ? 1 : 0;
+    Z = Y == 0 ? 1 : 0;
+    clock();
+    clock();
+    pc.p++;
+
+#ifdef DEBUG
+    printf("DEY\n");
+#endif
+    strcpy(last_instr, "DEY");
 }
 
 void STY_A() {
@@ -337,6 +424,20 @@ void BCC() {
     printf("BCC %d: %d\n", (char)data, Z);
 #endif
     strcpy(last_instr, "BCC");
+}
+
+void TYA() {
+    A = Y;
+    N = ((A >> 7) & 0b1) == 1 ? 1 : 0;
+    Z = A == 0 ? 1 : 0;
+    clock();
+    clock();
+    pc.p++;
+
+#ifdef DEBUG
+   printf("TYA\n");
+#endif
+   strcpy(last_instr, "TYA");
 }
 
 void STA_AY() {
@@ -428,6 +529,7 @@ void INY() {
     pc.p++;
     strcpy(last_instr, "INY");
 }
+
 void DEX() {
     X--;
     N = ((X >> 7) & 0b1) == 1 ? 1 : 0;
@@ -463,6 +565,7 @@ void TAX() {
 #endif
    strcpy(last_instr, "TAX");
 }
+
 void TAY() {
     Y = A;
     N = ((Y >> 7) & 0b1) == 1 ? 1 : 0;
@@ -548,6 +651,23 @@ void NOP() {
    strcpy(last_instr, "NOP");
 }
 
+void INC_A() {
+    ADDR addr;
+    abs_a(&addr, 1);
+    unsigned char val = bus_read_data(addr.p);
+    val++;
+    N = (val >> 7) & 0b1;
+    Z = val == 0 ? 1 : 0;
+    bus_write_data(addr.p, val);
+    clock();
+    clock();
+
+#ifdef DEBUG
+    printf("INC %x\n", val);
+#endif
+   strcpy(last_instr, "INC");
+
+}
 void BEQ() {
     clock();
     clock();
@@ -572,17 +692,50 @@ void BEQ() {
     strcpy(last_instr, "BEQ");
 }
 
-void interrupt() {
+void start_interrupt() {
+    bus_write_data(0x0100 + sp, pc.c[1]);
+    sp--;
+    bus_write_data(0x0100 + sp, (pc.c[0]));
+    sp--;
+    
+    unsigned char sr = N;
+    sr = (sr << 1) + V;
+    sr = (sr << 1) + 1;
+    sr = (sr << 1) + B;
+    sr = (sr << 1) + D;
+    sr = (sr << 1) + I;
+    sr = (sr << 1) + Z;
+    sr = (sr << 1) + C;
+    bus_write_data(0x100 + sp, sr);
+    sp--;
 
+    for (int i = 0; i < 7; i++) {
+        clock();
+    }
 }
 
-void non_maskable_interrupt() {
+void interrupt() {
+    if (I != 0) {
+        return;
+    }
+    set_irq_available(0);
+    in_irq = 1;
+    start_interrupt();
+    pc.c[0] = bus_read_data(0xFFFE);
+    pc.c[1] = bus_read_data(0xFFFF);
+}
 
+
+void non_maskable_interrupt() {
+    start_interrupt();
+    pc.c[0] = bus_read_data(0xFFFA);
+    pc.c[1] = bus_read_data(0xFFFB);
 }
 
 void clock() {
     int useconds = get_clock_speed();
     usleep(useconds);
+
 }
 
 void reset() {
@@ -594,7 +747,7 @@ void reset() {
     V = 0;
     B = 0;
     D = 0;
-    O = 0;
+    I = 1;
     Z = 0;
     C = 0;
 
@@ -614,15 +767,23 @@ void reset() {
 }
 
 void traceback() {
+    unsigned char instr = bus_read_data(pc.p);
     printf("DEBUG DATA: A: %x:%d, X: %X:%d, Y: %X:%d, C: %d, N: %d, Z: %d, V: %d\n", A, A, X,  X, Y, Y, (int)C, (int)N, (int)Z, (int)V);
     printf("SP: %x\n\n", sp);
+    printf("instruction: %x at %x. Exiting.\n", instr, pc.p);
+    
     printf("next 16 bytes in memory: \n");
     for (unsigned short i = pc.p; i < ((pc.p + 16) < 0xFFFF ? pc.p + 16 : 0xFFFF); i++) {
         printf("%x ", bus_read_data(i));
     }
     printf("\n");
 }
+
 void run_instr() {
+    if (get_irq_available() == 0 && in_irq == 0) {
+        interrupt();
+    }
+
     unsigned char instr = bus_read_data(pc.p);
     switch (instr) {
     case 0x0D:
@@ -637,17 +798,26 @@ void run_instr() {
     case 0x29:
         ANDI();
         break;
+    case 0x2C:
+        BITA();
+        break;
     case 0x2E:
         ROLA();
         break;
     case 0x38:
         SEC();
         break;
+    case 0x40:
+        RTI();
+        break;
     case 0x48:
         PHA();
         break;
     case 0x4C:
         JMP_A();
+        break;
+    case 0x58:
+        CLI();
         break;
     case 0x60:
         RTS();
@@ -661,6 +831,12 @@ void run_instr() {
     case 0x6A:
         RORA();
         break;
+    case 0x78:
+        SEI();
+        break;
+    case 0x88:
+        DEY();
+        break;
     case 0x8A:
         TXA();
         break;
@@ -672,6 +848,9 @@ void run_instr() {
         break;
     case 0x90:
         BCC();
+        break;
+    case 0x98:
+        TYA();
         break;
     case 0x99:
         STA_AY();
@@ -720,6 +899,9 @@ void run_instr() {
         break;
     case 0xEA:
         NOP();
+        break;
+    case 0xEE:
+        INC_A();
         break;
     case 0xF0:
         BEQ();

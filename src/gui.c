@@ -76,7 +76,7 @@ int main(int argc, char * argv[]) {
     wtimeout(stdscr, 0);
     int run = 1;
     int err = 0;
-    int last_char = wgetch(stdscr);
+    int last_char = getch();
     while(run) {
         run_instr();
         char str[17];
@@ -115,6 +115,7 @@ int main(int argc, char * argv[]) {
             if (get_quit_mode() == 0) run = 0;
             break;
         case 'c':
+            set_irq_available(1);
             wtimeout(stdscr, -1);
             display_center(5, "Input a new timeout.");
             char clock_str[10] = {0};
@@ -142,8 +143,19 @@ int main(int argc, char * argv[]) {
             display_center(6, "                    ");
             wtimeout(stdscr, 0);
             break;
+        case 'n': 
+            set_irq_available(1);
+            non_maskable_interrupt();
+            break;
+        case 'i':
+            ca1(0);
+            break;
+        case 'r':
+            reset();
+            break;
         default:
-            if (get_quit_mode() == 1) run = 0;
+            set_irq_available(1);
+            if (get_quit_mode() == 1) run = 0;    
             break;
         }
         last_char = wgetch(stdscr);
