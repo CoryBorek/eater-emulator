@@ -18,7 +18,8 @@ FILES ?= blink.bin \
 	number.bin \
 	hello-world-final.bin \
 	interrupt.bin \
-	rs232.bin
+	rs232.bin \
+	wozmon.bin
 
 #
 # Compile everything...

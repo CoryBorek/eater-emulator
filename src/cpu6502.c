@@ -52,6 +52,28 @@ void abs_a(ADDR* addr, int extra) {
     }
 }
 
+void zp(ADDR* addr) {
+    clock();
+    pc.p++;
+    addr->c[0] = bus_read_data(pc.p);
+    clock();
+    pc.p++;
+    addr->c[1] = 0x00;
+    clock();
+}
+
+void zp_x(ADDR* addr) {
+    clock();
+    pc.p++;
+    addr->c[0] = bus_read_data(pc.p);
+    clock();
+    pc.p++;
+    addr->c[1] = 0x00;
+    clock();
+    addr->p += (char)X;
+    clock();
+}
+
 void abs_x(ADDR* addr, int extra) {
     unsigned char h_i = pc.s.h;
     clock();
@@ -100,6 +122,56 @@ void imm(unsigned char* val) {
     pc.p++;
 }
 
+void indirect_x(ADDR * addr) {
+    ADDR addr2;
+    zp(&addr2);
+    addr2.c[0] += X;
+    addr->c[0] = bus_read_data(addr2.p);
+    addr2.p++;
+    addr->c[1] = bus_read_data(addr2.p);
+    clock();
+    clock();
+    clock();
+}
+
+void indirect(ADDR * addr) {
+    ADDR addr2;
+    abs_a(&addr2, 0);
+    addr->c[0] = bus_read_data(addr2.p);
+    addr2.p++;
+    addr->c[1] = bus_read_data(addr2.p);
+    clock();
+    clock();
+}
+
+void ORA_IMM() {
+     unsigned char val;
+     imm(&val);
+     A = A | val;
+     N = (A >> 7) & 0b1;
+     Z = A == 0;
+
+#ifdef DEBUG
+     printf("ORA %x %x\n", val, A);
+#endif
+     strcpy(last_instr, "ORA");
+}
+
+void ASL_A() {
+     C = (A >> 7) & 0b1;
+     A = A << 1;
+     N = (A >> 7) & 0b1;
+     Z = A == 0 ? 1 : 0;
+     clock();
+     clock();
+     pc.p++;
+#ifdef DEBUG
+     printf("ASL %d, %x\n", C, A);
+#endif
+     strcpy(last_instr, "ASL");
+}
+
+
 void CLC() {
     C = 0;
     pc.p++;
@@ -109,6 +181,31 @@ void CLC() {
    printf("CLC\n");
 #endif
    strcpy(last_instr, "CLC");
+}
+
+void BPL() {
+    clock();
+    clock();
+    pc.p++;
+    unsigned char data;
+    data = bus_read_data(pc.p);
+    pc.p++;
+    
+    //printf("Z: %d\n", Z);
+    if (N == 0) {
+        ADDR pc_orig;
+        pc_orig.p = pc.p;
+        pc.p = (unsigned short)((short)pc.p + (char) data);
+        clock();
+        if (pc_orig.s.h != pc.s.h) {
+            clock();
+        }
+    }
+
+#ifdef DEBUG
+    printf("BPL %d: %d\n", (char)data, N);
+#endif
+    strcpy(last_instr, "BPL");
 }
 
 void ORA_A() {
@@ -142,6 +239,55 @@ void JSR() {
      strcpy(last_instr, "JSR");
 }
 
+void AND_Z() {
+    ADDR addr;
+    zp(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    A = A & val;
+    Z = A == 0 ? 1 : 0;
+    N = ((A >> 7) & 0b1) == 1 ? 1 : 0; 
+#ifdef DEBUG
+   printf("AND %x\n", A);
+#endif
+   strcpy(last_instr, "AND");
+}
+
+void BIT_Z() {
+    ADDR addr;
+    zp(&addr);
+    unsigned char val = bus_read_data(addr.p);
+   
+    N = (val >> 7) & 0b1;
+    Z = (A & val) == 0 ? 1 : 0;
+    V = (val >> 6) & 0b1;
+
+#ifdef DEBUG
+   printf("BIT_Z %x\n", addr.p);
+#endif
+   strcpy(last_instr, "BIT");
+
+}
+
+void ROL_Z() {
+    ADDR addr;
+    zp(&addr);
+    
+    unsigned char value = bus_read_data(addr.p);
+    unsigned char temp = (value >> 7) & 0b1;
+    
+    value = ((value << 1) & 0xFF) + C;
+     C = temp;
+     Z = value == 0 ? 1 : 0;
+     N = (value >> 7) & 0b1;
+     bus_write_data(addr.p, value);
+     clock();
+     clock();
+#ifdef DEBUG
+     printf("ROL $(%x)\n", addr.p);
+#endif
+     strcpy(last_instr, "ROL");
+}
+
 void ANDI() {
     unsigned char val;
     imm(&val);
@@ -153,6 +299,32 @@ void ANDI() {
 #endif
    strcpy(last_instr, "AND");
 }
+
+void BMI() {
+    clock();
+    clock();
+    pc.p++;
+    unsigned char data;
+    data = bus_read_data(pc.p);
+    pc.p++;
+    
+    //printf("Z: %d\n", Z);
+    if (N == 1) {
+        ADDR pc_orig;
+        pc_orig.p = pc.p;
+        pc.p = (unsigned short)((short)pc.p + (char) data);
+        clock();
+        if (pc_orig.s.h != pc.s.h) {
+            clock();
+        }
+    }
+
+#ifdef DEBUG
+    printf("BMI %d: %d\n", (char)data, Z);
+#endif
+    strcpy(last_instr, "BMI");
+}
+
 
 void BITA() {
     ADDR addr;
@@ -201,6 +373,21 @@ void SEC() {
    strcpy(last_instr, "SEC");
 }
 
+void DEC() {
+    A--;
+    N = ((A >> 7) & 0b1) == 1 ? 1 : 0;
+    Z = A == 0 ? 1 : 0;
+    clock();
+    clock();
+    pc.p++;
+    strcpy(last_instr, "DEC");
+#ifdef DEBUG
+   printf("DEC\n");
+#endif
+   strcpy(last_instr, "DEC");
+
+}
+
 void RTI() {
     sp++;
     unsigned char sr = bus_read_data(0x0100 + sp);
@@ -247,6 +434,33 @@ void PHA() {
     strcpy(last_instr, "PHA");
 }
 
+void EOR_IMM() {
+    unsigned char val;
+    imm(&val);
+    A = A ^ val;
+    Z = A == 0 ? 1 : 0;
+    N = (A >> 7) & 0b1;
+    
+#ifdef DEBUG
+    printf("EOR\n");
+#endif
+    strcpy(last_instr, "EOR");
+}
+
+void LSR_A() {
+     C = A & 0b1;
+     A = A >> 1 & 0b01111111;
+     N = 0;
+     Z = A == 0 ? 1 : 0;
+     clock();
+     clock();
+     pc.p++;
+#ifdef DEBUG
+     printf("LSR %d, %x\n", C, A);
+#endif
+     strcpy(last_instr, "LSR");
+}
+
 void RTS() {
     sp++;
     pc.c[0] = bus_read_data(0x0100 + sp);
@@ -268,6 +482,31 @@ void JMP_A() {
      printf("JMP $%x\n", addr.p);
 #endif
      strcpy(last_instr, "JMP");
+}
+
+void BVC() {
+    clock();
+    clock();
+    pc.p++;
+    unsigned char data;
+    data = bus_read_data(pc.p);
+    pc.p++;
+    
+    //printf("Z: %d\n", Z);
+    if (V == 0) {
+        ADDR pc_orig;
+        pc_orig.p = pc.p;
+        pc.p = (unsigned short)((short)pc.p + (char) data);
+        clock();
+        if (pc_orig.s.h != pc.s.h) {
+            clock();
+        }
+    }
+
+#ifdef DEBUG
+    printf("BPL %d: %d\n", (char)data, N);
+#endif
+    strcpy(last_instr, "BPL");
 }
 
 void CLI() {
@@ -339,6 +578,16 @@ void RORA() {
     strcpy(last_instr, "ROR");
 }
 
+void JMP_I() {
+    ADDR addr;
+    indirect(&addr);
+    pc.p = addr.p;
+#ifdef DEBUG
+     printf("JMP\n");
+#endif
+     strcpy(last_instr, "JMP");
+}
+
 void SEI() {
     I = 1;
     clock();
@@ -348,6 +597,30 @@ void SEI() {
      printf("SEI\n");
 #endif
      strcpy(last_instr, "SEI");
+}
+
+void STA_IX() {
+    ADDR addr;
+    indirect_x(&addr);
+    bus_write_data(addr.p, A);
+}
+
+void STY_Z() {
+    ADDR addr;
+    zp(&addr);
+    bus_write_data(addr.p, Y);
+}
+
+void STA_Z() {
+    ADDR addr;
+    zp(&addr);
+    bus_write_data(addr.p, A);
+}
+
+void STX_Z() {
+    ADDR addr;
+    zp(&addr);
+    bus_write_data(addr.p, X);
 }
 
 void TXA() {
@@ -426,6 +699,17 @@ void BCC() {
     strcpy(last_instr, "BCC");
 }
 
+void STA_ZX() {
+    ADDR addr;
+    zp_x(&addr);
+    bus_write_data(addr.p, A);
+    
+#ifdef DEBUG
+    printf("STA $%x\n", addr.p);
+#endif
+    strcpy(last_instr, "STA");
+}
+
 void TYA() {
     A = Y;
     N = ((A >> 7) & 0b1) == 1 ? 1 : 0;
@@ -473,6 +757,18 @@ void LDY_IMM() {
    strcpy(last_instr, "LDY");
 }
 
+void LDA_IX() {
+    ADDR addr;
+    indirect_x(&addr);
+    A = bus_read_data(addr.p);
+    N = (((A >> 7) & 0b1) == 1) ? 1 : 0;
+    Z = A == 0 ? 1 : 0;
+#ifdef DEBUG
+   printf("LDA (%x,X)\n", A);
+#endif
+   strcpy(last_instr, "LDA");
+}
+
 void LDX_IMM() {
     unsigned char val;
     imm(&val);
@@ -497,6 +793,43 @@ void LDA_IMM() {
    strcpy(last_instr, "LDA");
 }
 
+void BCS() {
+    clock();
+    clock();
+    pc.p++;
+    unsigned char data;
+    data = bus_read_data(pc.p);
+    pc.p++;
+    
+    //printf("Z: %d\n", Z);
+    if (C == 1) {
+        ADDR pc_orig;
+        pc_orig.p = pc.p;
+        pc.p = (unsigned short)((short)pc.p + (char) data);
+        clock();
+        if (pc_orig.s.h != pc.s.h) {
+            clock();
+        }
+    }
+
+#ifdef DEBUG
+    printf("BCC %d: %d\n", (char)data, Z);
+#endif
+    strcpy(last_instr, "BCC");
+}
+
+void LDA_ZX() {
+    ADDR addr;
+    zp_x(&addr);
+    A = bus_read_data(addr.p);    
+    N = (((A >> 7) & 0b1) == 1) ? 1 : 0;
+    Z = A == 0 ? 1 : 0;
+#ifdef DEBUG
+    printf("LDA,X $(%x),%x\n", addr.p, X);
+#endif
+    strcpy(last_instr, "LDA,X");
+}
+
 void LDA_AY() {
     ADDR addr;
     abs_y(&addr, 0);
@@ -508,6 +841,7 @@ void LDA_AY() {
 #endif
     strcpy(last_instr, "LDA,Y");
 }
+
 void LDA_AX() {
     ADDR addr;
     abs_x(&addr, 0);
@@ -520,6 +854,56 @@ void LDA_AX() {
     strcpy(last_instr, "LDA,X");
 }
 
+void CPY_Z() {
+    ADDR addr;
+    zp(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    if (Y < val) {
+        Z = 0;
+        C = 0;
+        N = ((Y - val) >> 7) & 0b1;
+    } else if (Y == val) {
+        N = 0;
+        Z = 1;
+        C = 1;
+    } else {
+        Z = 0;
+        C = 1;
+        N = ((Y - val) >> 7) & 0b1;
+    }
+    
+#ifdef DEBUG
+    printf("CPY_Z, %X, %X\n", Y, val);
+#endif
+    strcpy(last_instr, "CPY");
+    
+}
+
+void CMP_Z() {
+    ADDR addr;
+    zp(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    if (A < val) {
+        Z = 0;
+        C = 0;
+        N = ((A - val) >> 7) & 0b1;
+    } else if (A == val) {
+        N = 0;
+        Z = 1;
+        C = 1;
+    } else {
+        Z = 0;
+        C = 1;
+        N = ((A - val) >> 7) & 0b1;
+    }
+    
+#ifdef DEBUG
+    printf("CMP_Z, %X, %X\n", A, val);
+#endif
+    strcpy(last_instr, "CMP");
+    
+}
+
 void INY() {
     Y++;
     N = ((Y >> 7) & 0b1) == 1 ? 1 : 0;
@@ -527,7 +911,35 @@ void INY() {
     clock();
     clock();
     pc.p++;
+#ifdef DEBUG
+    printf("INY\n");
+#endif
+    
     strcpy(last_instr, "INY");
+}
+
+void CMP_IMM() {
+    unsigned char val;
+    imm(&val);
+    if (A < val) {
+        Z = 0;
+        C = 0;
+        N = ((A - val) >> 7) & 0b1;
+    } else if (A == val) {
+        N = 0;
+        Z = 1;
+        C = 1;
+    } else {
+        Z = 0;
+        C = 1;
+        N = ((A - val) >> 7) & 0b1;
+    }
+    
+#ifdef DEBUG
+    printf("CMP_IMM, %X, %X\n", A, val);
+#endif
+    strcpy(last_instr, "CMP");
+    
 }
 
 void DEX() {
@@ -537,7 +949,22 @@ void DEX() {
     clock();
     clock();
     pc.p++;
-    strcpy(last_instr, "DEX");
+#ifdef DEBUG
+   printf("DEX\n");
+#endif
+   strcpy(last_instr, "DEX");
+}
+
+void LDA_Z() {
+    ADDR addr;
+    zp(&addr);
+    A = bus_read_data(addr.p);    
+    N = (((A >> 7) & 0b1) == 1) ? 1 : 0;
+    Z = A == 0 ? 1 : 0;
+#ifdef DEBUG
+   printf("LDA $(%x)\n", addr.p);
+#endif
+   strcpy(last_instr, "LDA");
 }
 
 void LDA_A() {
@@ -617,6 +1044,51 @@ void PHX() {
     pc.p++;
     strcpy(last_instr, "PHX");
 }
+
+void SBC_Z() {
+    ADDR addr;
+    zp(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    
+    unsigned char of = 0;
+    if (((A >> 7) & 0b1) == ((val >> 7) & 0b1)) {
+        of = 1;
+    }
+    short temp = (short)A;
+    temp += (C << 8);
+    temp -= val;
+    
+
+#ifdef DEBUG
+   printf("SBC 0x%x\n", temp);
+#endif
+    
+    C = (temp >> 8) & 0b1;
+    A = (unsigned char)(temp & 0xFF);
+    N = (temp >> 7) & 0b1;
+    Z = temp == 0 ? 1 : 0;
+    V = (of == 1 && ((val >> 7) & 0b1) != N) ? 1 : 0;
+    strcpy(last_instr, "SBC");
+}
+
+void INC_Z() {
+    ADDR addr;
+    zp(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    val++;
+    N = (val >> 7) & 0b1;
+    Z = val == 0 ? 1 : 0;
+    bus_write_data(addr.p, val);
+    clock();
+    clock();
+
+#ifdef DEBUG
+    printf("INC %x\n", val);
+#endif
+   strcpy(last_instr, "INC");
+
+}
+
 
 void INX() {
     X++;
@@ -818,14 +1290,32 @@ void run_instr() {
 
     unsigned char instr = bus_read_data(pc.p);
     switch (instr) {
+    case 0x09:
+        ORA_IMM();
+        break;
+    case 0x0A:
+        ASL_A();
+        break;
     case 0x0D:
         ORA_A();
+        break;
+    case 0x10:
+        BPL();
         break;
     case 0x18:
         CLC();
         break;
     case 0x20:
         JSR();
+        break;
+    case 0x24:
+        BIT_Z();
+        break;
+    case 0x25:
+        AND_Z();
+        break;
+    case 0x26:
+        ROL_Z();
         break;
     case 0x29:
         ANDI();
@@ -836,8 +1326,14 @@ void run_instr() {
     case 0x2E:
         ROLA();
         break;
+    case 0x30:
+        BMI();
+        break;
     case 0x38:
         SEC();
+        break;
+    case 0x3A:
+        DEC();
         break;
     case 0x40:
         RTI();
@@ -845,8 +1341,17 @@ void run_instr() {
     case 0x48:
         PHA();
         break;
+    case 0x49:
+        EOR_IMM();
+        break;
+    case 0x4A:
+        LSR_A();
+        break;
     case 0x4C:
         JMP_A();
+        break;
+    case 0x50:
+        BVC();
         break;
     case 0x58:
         CLI();
@@ -863,8 +1368,23 @@ void run_instr() {
     case 0x6A:
         RORA();
         break;
+    case 0x6C:
+        JMP_I();
+        break;
     case 0x78:
         SEI();
+        break;
+    case 0x81:
+        STA_IX();
+        break;
+    case 0x84:
+        STY_Z();
+        break;
+    case 0x85:
+        STA_Z();
+        break;
+    case 0x86:
+        STX_Z();
         break;
     case 0x88:
         DEY();
@@ -881,6 +1401,9 @@ void run_instr() {
     case 0x90:
         BCC();
         break;
+    case 0x95:
+        STA_ZX();
+        break;
     case 0x98:
         TYA();
         break;
@@ -893,8 +1416,14 @@ void run_instr() {
     case 0xA0:
         LDY_IMM();
         break;
+    case 0xA1:
+        LDA_IX();
+        break;
     case 0xA2:
         LDX_IMM();
+        break;
+    case 0xA5:
+        LDA_Z();
         break;
     case 0xAD:
         LDA_A();
@@ -908,14 +1437,29 @@ void run_instr() {
     case 0xA9:
         LDA_IMM();
         break;
+    case 0xB0:
+        BCS();
+        break;
+    case 0xB5:
+        LDA_ZX();
+        break;
     case 0xB9:
         LDA_AY();
         break;
     case 0xBD:
         LDA_AX();
         break;
+    case 0xC4:
+        CPY_Z();
+        break;
+    case 0xC5:
+        CMP_Z();
+        break;
     case 0xC8:
         INY();
+        break;
+    case 0xC9:
+        CMP_IMM();
         break;
     case 0xCA:
         DEX();
@@ -925,6 +1469,12 @@ void run_instr() {
         break;
     case 0xDA:
         PHX();
+        break;
+    case 0xE5:
+        SBC_Z();
+        break;
+    case 0xE6:
+        INC_Z();
         break;
     case 0xE8:
         INX();

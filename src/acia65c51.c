@@ -55,8 +55,9 @@ void init_acia(char* file_path) {
     }
     tty.c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
 
-    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
-    tty.c_oflag &= ~ONLCR;
+    //tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag |= ONLCR;
+    tty.c_oflag &= ~OCRNL;
     tty.c_lflag &= ~ICANON;
     tty.c_cc[VTIME] = 0;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
     tty.c_cc[VMIN] = 0;
@@ -239,6 +240,18 @@ unsigned char acia_read(unsigned char reg) {
     switch (reg) {
     case 0:
         status_register &= ~0b00001000;
+        char read_buf[1];
+        
+        int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+        
+        if (num_bytes < 0) {
+            printf("num bytes is invalid...\n");
+            exit(-1);
+        }
+        if (num_bytes > 0) {
+            read_data = read_buf[0];
+        }
+        
         return read_data;
         break;
     case 1:
@@ -246,20 +259,9 @@ unsigned char acia_read(unsigned char reg) {
         int bytes;
         ioctl(serial_port, FIONREAD, &bytes);
         if (bytes > 0) {
-            char read_buf[1];
-            
-            int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
-
-            if (num_bytes < 0) {
-                printf("num bytes is invalid...\n");
-                exit(-1);
-            }
-            if (num_bytes > 0) {
-                read_data = read_buf[0];
-                status_register |= 0b00001000;
-            } else {
-                status_register &= ~0b00001000;
-            }
+            status_register |= 0b00001000;
+        } else {
+            status_register &= ~0b00001000;
         }
         return status_register;
         break;
