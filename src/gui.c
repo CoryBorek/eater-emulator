@@ -29,8 +29,8 @@ void display_center(int yy, char * str)
 
 void char_to_binary_string(char* str, unsigned char n) {
     unsigned char i;
-    str[0] = '0';
-    int iter = 1;
+
+    int iter = 0;
     for (i = 1 << 7; i > 0; i = i / 2) {
         if ((n & i) != 0) {
             str[iter] = '1';
@@ -107,6 +107,11 @@ int main(int argc, char * argv[]) {
         char via_b[32];
         char_to_binary_string(via_b, out_b());
         display_center(0, via_b);
+
+        display_center(1, "VIA REGISTER A:");
+        char via_a[32];
+        char_to_binary_string(via_a, out_a());
+        display_center(2, via_a);
 
         switch (last_char) {
         case ERR:

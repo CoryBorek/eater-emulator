@@ -57,6 +57,7 @@ void display_read_instruction() {
         if (RS == 0 && RW == 0) {
             if (b_data == 1) {
                 clear_display();
+                return_home();
             } else if (b_data <= 3) {
                 return_home();
             } else if (b_data < 8) {
