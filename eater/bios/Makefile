@@ -1,22 +1,18 @@
 .PHONY: all cc65 clean
 
-OBJS= bios.bin
+all: cc65 bios.bin
 
-all: cc65 $(OBJS)
+cc65: cc65/bin/cc65
 
-cc65: bin/cc65
-
-bin/cc65:
+cc65/bin/cc65:
 	git clone https://github.com/cc65/cc65.git
 	$(MAKE) -C cc65 -j8
-	mv cc65/bin .
-	rm -rf cc65
 
-bios.bin: bios.o
-	./bin/ld65 -C bios.cfg -o $@ $< -Ln bios.sym
+bios.bin: bios.o 
+	./cc65/bin/ld65 -C bios.cfg -o $@ $< -Ln bios.lbl
 
-%.o: %.s
-	./bin/ca65 $<
+bios.o: bios.s wozmon.s
+	./cc65/bin/ca65 bios.s
 clean:
-	rm -f $(OBJS) *.o
-	rm -rf bin
+	rm -f bios.bin *.o bios.lbl
+	rm -rf cc65
