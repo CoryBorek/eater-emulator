@@ -13,7 +13,7 @@
 unsigned char transmit_data = 0;
 unsigned char read_data = 0;
 
-unsigned char status_register = 0;
+unsigned char acia_status_register = 0;
 unsigned char control_register = 0;
 unsigned char command_register = 0;
 // control register bits
@@ -242,7 +242,7 @@ unsigned char acia_read(unsigned char reg) {
     reg &= 0b11;
     switch (reg) {
     case 0:
-        status_register &= ~0b00001000;
+        acia_status_register &= ~0b00001000;
         char read_buf[1];
         
         int num_bytes = read(serial_port, &read_buf, sizeof(read_buf));
@@ -258,15 +258,15 @@ unsigned char acia_read(unsigned char reg) {
         return read_data;
         break;
     case 1:
-        status_register |= 0b00010000;
+        acia_status_register |= 0b00010000;
         int bytes;
         ioctl(serial_port, FIONREAD, &bytes);
         if (bytes > 0) {
-            status_register |= 0b00001000;
+            acia_status_register |= 0b00001000;
         } else {
-            status_register &= ~0b00001000;
+            acia_status_register &= ~0b00001000;
         }
-        return status_register;
+        return acia_status_register;
         break;
     case 2:
         return command_register;

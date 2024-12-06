@@ -13,7 +13,7 @@ MODE?=main
 CC? = gcc
 
 # Basic C arguments
-CARGS= -Wall -Iinclude
+CARGS= -Wall -Iinclude -g
 
 # C Objects
 OBJS =	obj/modes.o \
@@ -23,7 +23,26 @@ OBJS =	obj/modes.o \
 	obj/bus.o \
 	obj/ram.o \
 	obj/eeprom26c256.o \
+	obj/cpu/addressing.o \
+	obj/cpu/common.o \
+	obj/cpu/instr_0.o \
+	obj/cpu/instr_1.o \
+	obj/cpu/instr_2.o \
+	obj/cpu/instr_3.o \
+	obj/cpu/instr_4.o \
+	obj/cpu/instr_5.o \
+	obj/cpu/instr_6.o \
+	obj/cpu/instr_7.o \
+	obj/cpu/instr_8.o \
+	obj/cpu/instr_9.o \
+	obj/cpu/instr_A.o \
+	obj/cpu/instr_B.o \
+	obj/cpu/instr_C.o \
+	obj/cpu/instr_D.o \
+	obj/cpu/instr_E.o \
+	obj/cpu/instr_F.o \
 	obj/cpu6502.o
+
 
 #
 # GUI mode C arguments
@@ -52,7 +71,7 @@ $(TARGET_DIR)/emu: src/$(MODE).c $(OBJS)
 # Utility Libraries
 #
 obj/%.o: src/%.c
-	@mkdir -p obj
+	@mkdir -p obj/cpu
 	@$(CC) $(CARGS) -c -o $@ $<
 	@echo CC    $<
 #

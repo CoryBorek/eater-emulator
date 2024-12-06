@@ -10,4 +10,7 @@ int get_clock_speed();
 int get_irq_available();
 void set_irq_available(int available);
 
+int get_irq_mode();
+void set_irq_mode(int new_irq_mode);
+
 #endif

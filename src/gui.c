@@ -52,16 +52,15 @@ int main(int argc, char * argv[]) {
     curs_set(0);
 
     // Get the screen size
-    int y, x;
-    getmaxyx(stdscr, y, x);
+    int s_y, s_x;
+    getmaxyx(stdscr, s_y, s_x);
     
     // Write a message at the bottom left of the screen
-    mvwprintw(stdscr, y-1, x-x, "Press q to close");
+    mvwprintw(stdscr, s_y-1, s_x-s_x, "Press q to close");
     
     display_center(-8, "6502 BE Emulator");
     
     init_bus();
-    
     init_ram(0x00, 0x4000);
     set_clock_speed(1);
     char * acia_file = "";
@@ -85,41 +84,71 @@ int main(int argc, char * argv[]) {
     int run = 1;
     int err = 0;
     int last_char = getch();
+    char prev_dram[80];
+    unsigned char prev_b = 0;
+    unsigned char prev_a = 0;
+
+    display_center(-1, "VIA REGISTER B:");
+    display_center(1, "VIA REGISTER A:");
+
     while(run) {
         run_instr();
+
+        
         char str[17];
         char str2[17];
         
-        char instr[30];
-        const char * last_instr = get_last_instr();
-        strcpy(instr, last_instr);
         char * dram = get_DRAM();
+        if (strcmp(prev_dram, dram) != 0) {
+            display_center(-5, "                ");
+            display_center(-4, "                ");
+        }
+        strcpy(prev_dram, dram);
         for (int i = 0; i < 16; i++) {
             str[i] = dram[i];
             str2[i] = dram[41+i];
         }
+
         str[16] = 0;
         str2[16] = 0;
-        
         display_center(-5, str);
         display_center(-4, str2);
-        display_center(4, "                ");
-        display_center(4, instr);
-        if (strcmp(instr, "ERROR") == 0) {
+        
+        char instr_str[17];
+        strcpy(instr_str, last_instr());
+        for (int i = strlen(instr_str); i < 17; i++) {
+            instr_str[i] = ' ';
+        }
+        instr_str[16] = 0;
+        display_center(4, instr_str);
+        
+        if (strcmp(last_instr(), "ERROR") == 0) {
             err = 1;
             run = 0;
             break;
         }
         
-        display_center(-1, "VIA REGISTER B:");
-        char via_b[32];
-        char_to_binary_string(via_b, out_b());
-        display_center(0, via_b);
+        
+        
+        unsigned char curr_a = out_a();
+        unsigned char curr_b = out_b();
+        
+        if (prev_a != curr_a) {
+            char via_a[32];
+            display_center(2, "                ");
+            char_to_binary_string(via_a, curr_a);
+            display_center(2, via_a);
+        }
 
-        display_center(1, "VIA REGISTER A:");
-        char via_a[32];
-        char_to_binary_string(via_a, out_a());
-        display_center(2, via_a);
+        if (prev_b != curr_b) {
+            char via_b[32];
+            char_to_binary_string(via_b, curr_b);
+            display_center(0, "                ");
+            display_center(0, via_b);
+        }
+
+        prev_a = curr_a;
+        prev_b = curr_b;
 
         switch (last_char) {
         case ERR:
@@ -173,8 +202,6 @@ int main(int argc, char * argv[]) {
         }
         last_char = wgetch(stdscr);
     }
-
-    
     
     endwin();
     

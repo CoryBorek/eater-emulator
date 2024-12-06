@@ -39,15 +39,6 @@ int main(int argc, char * argv[]) {
         }
     }
     init_acia(acia_file);
-if (argc > 1) {
-        FILE * fptr;
-        fptr = fopen(argv[1], "r");
-        unsigned char data[32768];
-        
-        fread(data, sizeof(data), 1, fptr);
-        eeprom_init(data, 0x8000, 0x8000);
-        fclose(fptr);
-    }
     reset();
 
     // run 100 instructions;

@@ -47,9 +47,11 @@ divloop:
 	;; Rotate quotient and remainder
 	rol value
 	rol value + 1
+	lda value + 1
 	rol mod10
+	lda mod10
 	rol mod10 + 1
-
+	
 	;; a,y = dividend - divisor
 	sec
 	lda mod10
@@ -58,15 +60,17 @@ divloop:
 	lda mod10 + 1
 	sbc #0
 	bcc ignore_result 	; branch if dividend < divisor
+	.byte 0
 	sty mod10
 	sta mod10 + 1
 	
 ignore_result:
+	
 	dex
 	bne divloop
 	rol value		;shift in the last bit of the quotient
 	rol value + 1
-	
+
 	lda mod10
 	clc
 	adc #"0"

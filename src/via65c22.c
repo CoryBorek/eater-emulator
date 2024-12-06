@@ -104,7 +104,6 @@ void in_b(unsigned char new_b) {
     RB = new_b & ~DDRB & 0xFF;
 }
 
-
 void ca1(int val) {
     unsigned char ctrl = pcr & 0b1;
     if ((val & 0b1) == ctrl) {
