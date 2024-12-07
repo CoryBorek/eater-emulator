@@ -10,10 +10,18 @@ void beq() {
     branch(*Z() == 1);
 }
 
+void plx() {
+    strcpy(last_instr(), "PLX");
+    pull(X());
+}
+
 void instrF(unsigned char instr) {
     switch (instr) {
     case 0x0:
         beq();
+        break;
+    case 0xA:
+        plx();
         break;
     default:
         unknown();
