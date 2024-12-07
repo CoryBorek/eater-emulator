@@ -10,9 +10,9 @@ void jsr() {
     strcpy(last_instr(), "JSR");
     ADDR addr;
     abs_a(&addr, 3);
-    bus_write_data(0x100 + *sp(), pc()->s.h);
+    bus_write_data(0x100 + *sp(), pc()->c[1]);
     (*sp())--;
-    bus_write_data(0x100 + *sp(), pc()->s.l);
+    bus_write_data(0x100 + *sp(), pc()->c[0]);
     (*sp())--;
     pc()->p = addr.p;
 }
@@ -35,6 +35,15 @@ void rol_abs() {
 
 void instr2(unsigned char instr) {
     switch (instr) {
+    case 0x0:
+        jsr();
+        break;
+    case 0x9:
+        and_imm();
+        break;
+    case 0xE:
+        rol_abs();
+        break;
     default:
         unknown();
         break;

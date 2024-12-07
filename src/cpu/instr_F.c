@@ -12,6 +12,9 @@ void beq() {
 
 void instrF(unsigned char instr) {
     switch (instr) {
+    case 0x0:
+        beq();
+        break;
     default:
         unknown();
     }

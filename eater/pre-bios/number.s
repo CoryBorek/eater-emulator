@@ -32,6 +32,7 @@ reset:
 	;; Initialize value to be the number to convert
 	lda number
 	sta value
+	lda value
 	lda number + 1
 	sta value + 1
 
@@ -47,9 +48,7 @@ divloop:
 	;; Rotate quotient and remainder
 	rol value
 	rol value + 1
-	lda value + 1
 	rol mod10
-	lda mod10
 	rol mod10 + 1
 	
 	;; a,y = dividend - divisor
@@ -60,7 +59,6 @@ divloop:
 	lda mod10 + 1
 	sbc #0
 	bcc ignore_result 	; branch if dividend < divisor
-	.byte 0
 	sty mod10
 	sta mod10 + 1
 	

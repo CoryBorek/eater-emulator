@@ -6,14 +6,6 @@
 
 #include <string.h>
 
-void lda_ax() {
-    strcpy(last_instr(), "LDA_ABSX");
-    ADDR addr;
-    abs_x(&addr, -1);
-    unsigned char val = bus_read_data(addr.p);
-    ldr(A(), val);
-}
-
 
 void lda_ay() {
     strcpy(last_instr(), "LDA_ABSY");
@@ -23,8 +15,23 @@ void lda_ay() {
     ldr(A(), val);
 }
 
+void lda_ax() {
+    strcpy(last_instr(), "LDA_ABSX");
+    ADDR addr;
+    abs_x(&addr, -1);
+    unsigned char val = bus_read_data(addr.p);
+    ldr(A(), val);
+}
+
+
 void instrB(unsigned char instr) {
     switch (instr) {
+    case 0x9:
+        lda_ay();
+        break;
+    case 0xD:
+        lda_ax();
+        break;
     default:
         unknown();
         break;

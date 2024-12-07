@@ -6,11 +6,14 @@
 
 void bne() {
     strcpy(last_instr(), "BNE");
-    branch(Z() == 0);
+    branch(*Z() == 0);
 }
 
 void instrD(unsigned char instr) {
     switch (instr) {
+    case 0x0:
+        bne();
+        break;
     default:
         unknown();
         break;

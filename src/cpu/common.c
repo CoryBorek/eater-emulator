@@ -9,14 +9,20 @@
 
 
 void adc(unsigned char val) {
-    unsigned short value = ((unsigned short)val);
-    unsigned short temp = (unsigned short)*A() + value + (unsigned short)*C();
-    *C() = (temp >> 8) & 0b1;
-    *Z() = (temp & 0xFF) == 0 ? 1 : 0;
-    *V() = (~((unsigned short)*A() ^ (unsigned short)value) & ((unsigned short)*A() ^ (unsigned short)temp) & 0x0080) ? 1 : 0;
-    *N() = (temp >> 7) & 0b1;
-    *A() = temp & 0x00FF;
+    unsigned char of = 0;
+    if (((*A() >> 7) & 0b1) == ((val >> 7) & 0b1)) {
+        of = 1;
+    }
 
+    unsigned short temp = (unsigned short)*A();
+    temp += val;
+    temp += (*C() & 0b1);
+
+    *C() = (temp >> 8) & 0b1;
+    *A() = (unsigned char)(temp & 0xFF);
+    *N() = (temp >> 7) & 0b1;
+    *Z() = temp == 0 ? 1 : 0;
+    *V() = (of == 1 && ((val >> 7) & 0b1) != *N()) ? 1 : 0;
 }
 
 void and(unsigned char val) {
@@ -79,7 +85,7 @@ void inr(unsigned char * reg) {
     impl();
     clockn(2);
     (*reg)++;
-    *N() = (*reg >> 7) & 0b1;
+    *N() = ((*reg >> 7) & 0b1) == 1 ? 1 : 0;
     *Z() = *reg == 0 ? 1 : 0;
 }
 
@@ -103,6 +109,7 @@ void ora(ADDR * addr) {
     *A() = *A() | val;
     *N() = (*A() >> 7) & 0b1;
     *Z() = *A() == 0 ? 1 : 0;
+    
 }
 
 void push(unsigned char * reg) {
@@ -116,49 +123,58 @@ void pull(unsigned char * reg) {
     impl();
     clockn(4);
     (*sp())++;
-    unsigned char data = bus_read_data(0x100 + *sp());
-    *reg = data;
-    *N() = (data >> 7) & 0b1;
-    *Z() = data == 0 ? 1 : 0;
+    *reg = bus_read_data(0x100 + *sp());
+
+    *N() = (*reg >> 7) & 0b1;
+    *Z() = *reg == 0 ? 1 : 0;
 }
 
 unsigned char rol(unsigned char val) {
-    unsigned short temp = (unsigned short)(val << 1) | *C();
-    *C() = (temp >> 8) & 0b1;
-    *Z() = (temp & 0xFF) == 0 ? 1 : 0;
-    *N() = (temp >> 7) & 0b1;
-    return (unsigned char)(temp & 0x00FF);
+    unsigned char temp = (val >> 7) & 0b1;
+    val = ((val << 1) & 0xFF) + *C();
+    *C() = temp;
+    *Z() = val == 0 ? 1 : 0;
+    *N() = (val >> 7) & 0b1;
+    return val;
 }
 
 unsigned char ror(unsigned char val) {
-    int temp = val & 0b1;
+    unsigned char carry = val & 0b1;
     val = val >> 1;
     val = (*C() << 7) + val;
-    *C() = temp;
-    *N() = (val >> 7) & 0b1;
+    *C() = carry;
+    *N() = (((val >> 7) & 0b1) == 1) ? 1 : 0;
     *Z() = val == 0 ? 1 : 0;
     return val;
-
 }
 
 void sbc(unsigned char val) {
-    unsigned short value = ((unsigned short)val) ^ 0x00FF;
-    unsigned short temp = (unsigned short)*A() + value + (unsigned short)*C();
-    *C() = (temp & 0xFF00) ? 1 : 0;
-    *Z() = (temp & 0xFF) == 0 ? 1 : 0;
-    *V() = (temp ^ (unsigned short)*A()) & (temp ^ value) & 0x0080 ? 1 : 0;
+    
+    unsigned char of = 0;
+    if (((*A() >> 7) & 0b1) == ((val >> 7) & 0b1)) {
+        of = 1;
+    }
+    short temp = (short)*A();
+    temp += (*C() << 8);
+    temp -= val;
+    
+    *C() = (temp >> 8) & 0b1;
+    *A() = (unsigned char)(temp & 0xFF);
     *N() = (temp >> 7) & 0b1;
-    *A() = (unsigned char)(temp & 0x00FF);
+    *Z() = temp == 0 ? 1 : 0;
+    *V() = (of == 1 && ((val >> 7) & 0b1) != *N()) ? 1 : 0;
 }
 
 void str(unsigned char * reg, ADDR * addr) {
     bus_write_data(addr->p, *reg);
 }
 
-void trr(unsigned char * reg1, unsigned char * reg2) {
+void trr(unsigned char * reg1, unsigned char * reg2, int flag) {
     impl();
     clockn(2);
     *reg2 = *reg1;
-    *N() = (*reg2 >> 7) & 0b1;
-    *Z() = *reg2 == 0 ? 1 : 0;
+    if (flag == 1) {
+        *N() = (*reg2 >> 7) & 0b1;
+        *Z() = *reg2 == 0 ? 1 : 0;
+    }
 }

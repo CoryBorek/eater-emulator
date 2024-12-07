@@ -13,6 +13,9 @@ void sec() {
 
 void instr3(unsigned char instr) {
     switch (instr) {
+    case 0x8:
+        sec();
+        break;
     default:
         unknown();
         break;

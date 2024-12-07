@@ -12,8 +12,10 @@ void ora_abs() {
 }
 
 void instr0(unsigned char instr) {
-    
     switch (instr) {
+    case 0xD:
+        ora_abs();
+        break;
     default:
         unknown();
     }

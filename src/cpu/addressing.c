@@ -32,13 +32,13 @@ void abs_a(ADDR * addr, int extra) {
 }
 
 void abs_x(ADDR * addr, int extra) {
+    ADDR temp;
+    temp.p = addr->p;
     pp();
     addr->c[0] = bus_read_data(pc()->p);
     pp();
     addr->c[1] = bus_read_data(pc()->p);
     pp();
-    ADDR temp;
-    temp.p = addr->p;
     addr->p += (char)(*X());
     
     if (extra < 0) {
@@ -52,13 +52,13 @@ void abs_x(ADDR * addr, int extra) {
 }
 
 void abs_y(ADDR * addr, int extra) {
-        pp();
+    ADDR temp;
+    temp.p = addr->p;
+    pp();
     addr->c[0] = bus_read_data(pc()->p);
     pp();
     addr->c[1] = bus_read_data(pc()->p);
     pp();
-    ADDR temp;
-    temp.p = addr->p;
     addr->p += (char)(*Y());
     
     if (extra < 0) {

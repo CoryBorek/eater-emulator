@@ -18,6 +18,12 @@ void sbc_imm() {
 }
 void instrE(unsigned char instr) {
     switch(instr) {
+    case 0x8:
+        inx();
+        break;
+    case 0x9:
+        sbc_imm();
+        break;
     default:
         unknown();
     }

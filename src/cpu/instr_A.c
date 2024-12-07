@@ -22,7 +22,7 @@ void ldx_imm() {
 
 void tay() {
     strcpy(last_instr(), "TAY");
-    trr(A(), Y());
+    trr(A(), Y(), 1);
 }
 
 void lda_imm() {
@@ -34,7 +34,7 @@ void lda_imm() {
 
 void tax() {
     strcpy(last_instr(), "TAX");
-    trr(A(), X());
+    trr(A(), X(), 1);
 }
 
 void lda_abs() {
@@ -48,6 +48,24 @@ void lda_abs() {
 void instrA(unsigned char instr) {
     
     switch (instr) {
+    case 0x0:
+        ldy_imm();
+        break;
+    case 0x2:
+        ldx_imm();
+        break;
+    case 0x8:
+        tay();
+        break;
+    case 0x9:
+        lda_imm();
+        break;
+    case 0xA:
+        tax();
+        break;
+    case 0xD:
+        lda_abs();
+        break;
     default:
         unknown();
         break;

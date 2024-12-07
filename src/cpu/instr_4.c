@@ -7,8 +7,8 @@
 
 
 void pha() {
-        strcpy(last_instr(), "PHA");
-        push(A());
+    strcpy(last_instr(), "PHA");
+    push(A());
 }
 void jmp_abs() {
     strcpy(last_instr(), "JMP_ABS");
@@ -19,6 +19,12 @@ void jmp_abs() {
 
 void instr4(unsigned char instr) {
     switch (instr) {
+    case 0x8:
+        pha();
+        break;
+    case 0xC:
+        jmp_abs();
+        break;
     default:
         unknown();
         break;

@@ -16,6 +16,12 @@ void dex() {
 
 void instrC(unsigned char instr) {
     switch (instr) {
+    case 0xA:
+        dex();
+        break;
+    case 0x8:
+        iny();
+        break;
     default:
         unknown();
         break;

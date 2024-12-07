@@ -10,9 +10,9 @@ void rts() {
     strcpy(last_instr(), "RTS");
     clockn(6);
     (*sp())++;
-    pc()->s.l = bus_read_data(0x100 + *sp());
+    pc()->c[0] = bus_read_data(0x100 + *sp());
     (*sp())++;
-    pc()->s.h = bus_read_data(0x100 + *sp());
+    pc()->c[1] = bus_read_data(0x100 + *sp());
 }
 
 void pla() {
@@ -36,6 +36,18 @@ void rora() {
 
 void instr6(unsigned char instr) {
     switch (instr) {
+    case 0x0:
+        rts();
+        break;
+    case 0x8:
+        pla();
+        break;
+    case 0x9:
+        adc_imm();
+        break;
+    case 0xA:
+        rora();
+        break;
     default:
         unknown();
         break;

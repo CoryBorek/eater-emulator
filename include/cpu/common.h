@@ -44,6 +44,6 @@ void sbc(unsigned char val);
 
 void str(unsigned char * reg, ADDR * addr);
 
-void trr(unsigned char * reg1, unsigned char * reg2);
+void trr(unsigned char * reg1, unsigned char * reg2, int flag);
 
 #endif

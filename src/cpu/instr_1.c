@@ -12,6 +12,8 @@ void clc() {
 void instr1(unsigned char instr) {
     switch (instr) {
     case 0x8:
+        clc();
+        break;
     default:    
         unknown();
         break;
