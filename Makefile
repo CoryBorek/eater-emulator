@@ -7,7 +7,7 @@ TARGET_DIR ?= .
 #
 # mode can be either main or gui.
 #
-MODE?=main
+MODE?=gui
 
 # C Emulator
 CC? = gcc

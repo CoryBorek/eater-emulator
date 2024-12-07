@@ -14,6 +14,9 @@ void cli() {
 
 void instr5(unsigned char instr) {
     switch (instr) {
+    case 0x8:
+        cli();
+        break;
     default:
         unknown();
         break;

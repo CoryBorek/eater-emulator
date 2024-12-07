@@ -16,6 +16,14 @@ void sbc_imm() {
     imm(&val);
     sbc(val);
 }
+
+void inc_abs() {
+    strcpy(last_instr(), "INC_ABS");
+    ADDR addr;
+    abs_a(&addr, 3);
+    inc(&addr);
+}
+
 void instrE(unsigned char instr) {
     switch(instr) {
     case 0x8:
@@ -23,6 +31,9 @@ void instrE(unsigned char instr) {
         break;
     case 0x9:
         sbc_imm();
+        break;
+    case 0xE:
+        inc_abs();
         break;
     default:
         unknown();

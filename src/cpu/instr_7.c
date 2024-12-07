@@ -13,6 +13,9 @@ void sei() {
 
 void instr7(unsigned char instr) {
     switch (instr) {
+    case 0x8:
+        sei();
+        break;
     default:
          unknown();
          break;

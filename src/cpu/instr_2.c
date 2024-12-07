@@ -24,6 +24,13 @@ void and_imm() {
     and(val);
 }
 
+void bit_abs() {
+    strcpy(last_instr(), "BIT_ABS");
+    ADDR addr;
+    abs_a(&addr, 1);
+    bit(bus_read_data(addr.p));
+}
+
 void rol_abs() {
     strcpy(last_instr(), "ROL_ABS");
     ADDR addr;
@@ -40,6 +47,9 @@ void instr2(unsigned char instr) {
         break;
     case 0x9:
         and_imm();
+        break;
+    case 0xC:
+        bit_abs();
         break;
     case 0xE:
         rol_abs();

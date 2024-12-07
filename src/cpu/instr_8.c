@@ -5,6 +5,11 @@
 #include <string.h>
 
 
+void dey() {
+    strcpy(last_instr(), "DEY");
+    der(Y());
+}
+
 void txa() {
     strcpy(last_instr(), "TXA");
     trr(X(), A(), 1);
@@ -26,6 +31,9 @@ void sta_abs() {
 
 void instr8(unsigned char instr) {
     switch (instr) {
+    case 0x8:
+        dey();
+        break;
     case 0xA:
         txa();
         break;

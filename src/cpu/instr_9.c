@@ -21,10 +21,18 @@ void txs() {
     trr(X(), sp(), 0);
 }
 
+void tya() {
+    strcpy(last_instr(), "TYA");
+    trr(Y(), A(), 1);
+}
+
 void instr9(unsigned char instr) {
     switch (instr) {
     case 0x0:
         bcc();
+        break;
+    case 0x8:
+        tya();
         break;
     case 0x9:
         sta_y();

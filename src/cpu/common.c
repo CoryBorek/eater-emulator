@@ -37,7 +37,9 @@ unsigned char asl(unsigned char val) {
 }
 
 void bit(unsigned char val) {
-    crash_me();
+    *Z() = *A() & val == 0 ? 1 : 0;
+    *N() = (val >> 7) & 0b1;
+    *V() = (val >> 6) & 0b1;
 }
 
 void branch(int check) {
@@ -78,7 +80,11 @@ void eor(unsigned char val) {
 }
 
 void inc(ADDR * addr) {
-    crash_me();
+    unsigned char val = bus_read_data(addr->p);
+    val++;
+    *N() = ((val >> 7) & 0b1) == 1 ? 1 : 0;
+    *Z() = val == 0 ? 1 : 0;
+    bus_write_data(addr->p, val);
 }
 
 void inr(unsigned char * reg) {
