@@ -108,7 +108,12 @@ void zpg(ADDR * addr) {
 }
 
 void zpg_x(ADDR * addr) {
-    crash_me();
+    clockn(4);
+    pp();
+    addr->c[0] = bus_read_data(pc()->p);
+    addr->c[1] = 0x00;
+    addr->p += *X();
+    pp();
 }
 
 void zpg_y(ADDR * addr) {

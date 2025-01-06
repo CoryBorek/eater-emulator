@@ -7,6 +7,15 @@
 #include <string.h>
 
 
+
+void lda_zpx() {
+    strcpy(last_instr(), "LDA_ZPX");
+    ADDR addr;
+    zpg_x(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    ldr(A(), val);
+}
+
 void lda_ay() {
     strcpy(last_instr(), "LDA_ABSY");
     ADDR addr;
@@ -26,6 +35,9 @@ void lda_ax() {
 
 void instrB(unsigned char instr) {
     switch (instr) {
+    case 0x5:
+        lda_zpx();
+        break;
     case 0x9:
         lda_ay();
         break;

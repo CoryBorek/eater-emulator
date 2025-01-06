@@ -5,6 +5,11 @@
 
 #include <string.h>
 
+void bvc() {
+    strcpy(last_instr(), "BVC");
+    branch(*V() == 0);
+}
+
 void cli() {
     strcpy(last_instr(), "CLI");
     impl();
@@ -14,6 +19,9 @@ void cli() {
 
 void instr5(unsigned char instr) {
     switch (instr) {
+    case 0x0:
+        bvc();
+        break;
     case 0x8:
         cli();
         break;
