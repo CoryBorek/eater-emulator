@@ -63,18 +63,18 @@ void branch(int check) {
 }
 
 void cmp(unsigned char * reg, unsigned char val) {
-    if (*A() < val) {
+    if (*reg < val) {
         *Z() = 0;
         *C() = 0;
-        *N() = ((*A() - val) >> 7) & 0b1;
-    } else if (*A() == val) {
+        *N() = ((*reg - val) >> 7) & 0b1;
+    } else if (*reg == val) {
         *N() = 0;
         *Z() = 1;
         *C() = 1;
     } else {
         *Z() = 0;
         *C() = 1;
-        *N() = ((*A() - val) >> 7) & 0b1;
+        *N() = ((*reg - val) >> 7) & 0b1;
     }
 }
 
