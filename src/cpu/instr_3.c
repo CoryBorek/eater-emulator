@@ -5,6 +5,12 @@
 
 #include <string.h>
 
+
+void bmi() {
+    strcpy(last_instr(), "BMI");
+    branch(*N() == 1);
+}
+
 void sec() {
     strcpy(last_instr(), "SEC");
     impl();
@@ -19,6 +25,9 @@ void dec_a() {
 
 void instr3(unsigned char instr) {
     switch (instr) {
+    case 0x0:
+        bmi();
+        break;
     case 0x8:
         sec();
         break;
