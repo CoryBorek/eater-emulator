@@ -91,7 +91,9 @@ void der(unsigned char * reg) {
 }
 
 void eor(unsigned char val) {
-    crash_me();
+    *A() = *A() ^ val;
+    *Z() = *A() == 0 ? 1 : 0;
+    *N() = (*A() >> 7) & 0b1;
 }
 
 void inc(ADDR * addr) {

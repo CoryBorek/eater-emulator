@@ -25,6 +25,13 @@ void pha() {
     push(A());
 }
 
+void eor_imm() {
+    strcpy(last_instr(), "EOR_IMM");
+    unsigned char val;
+    imm(&val);
+    eor(val);
+}
+
 void jmp_abs() {
     strcpy(last_instr(), "JMP_ABS");
     ADDR addr;
@@ -39,6 +46,9 @@ void instr4(unsigned char instr) {
         break;
     case 0x8:
         pha();
+        break;
+    case 0x9:
+        eor_imm();
         break;
     case 0xC:
         jmp_abs();
