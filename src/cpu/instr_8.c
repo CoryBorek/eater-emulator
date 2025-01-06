@@ -5,6 +5,13 @@
 #include <string.h>
 
 
+void sta_zp() {
+    strcpy(last_instr(), "STA_ZP");
+    ADDR addr;
+    zpg(&addr);
+    str(A(), &addr);
+}
+
 void dey() {
     strcpy(last_instr(), "DEY");
     der(Y());
@@ -31,6 +38,9 @@ void sta_abs() {
 
 void instr8(unsigned char instr) {
     switch (instr) {
+    case 0x5:
+        sta_zp();
+        break;
     case 0x8:
         dey();
         break;

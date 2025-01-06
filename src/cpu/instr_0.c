@@ -11,6 +11,7 @@ void asl_a() {
     clockn(2);
     *A() = asl(*A());
 }
+
 void ora_abs() {
     strcpy(last_instr(), "ORA_ABS");
     ADDR addr;

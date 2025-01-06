@@ -99,7 +99,12 @@ void rel(ADDR * addr) {
 }
 
 void zpg(ADDR * addr) {
-    crash_me();
+    clockn(3);
+    pp();
+    addr->c[0] = bus_read_data(pc()->p);
+    addr->c[1] = 0x00;
+    pp();
+    
 }
 
 void zpg_x(ADDR * addr) {

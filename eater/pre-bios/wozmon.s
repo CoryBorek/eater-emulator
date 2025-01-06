@@ -52,7 +52,7 @@ NEXTCHAR:
                 STA     IN,Y           ; Add to text buffer.
                 JSR     ECHO           ; Display character.
                 CMP     #$0D           ; CR?
-                BNE     NOTCR          ; No.
+                BNE     NOTCR          ; No
 
                 LDY     #$FF           ; Reset text index.
                 LDA     #$00           ; For XAM mode.
