@@ -14,6 +14,14 @@ void sbc_zp() {
     sbc(val);
 }
 
+void inc_zp() {
+    strcpy(last_instr(), "INC_ZP");
+    ADDR addr;
+    zpg(&addr);
+    clockn(2);
+    inc(&addr);
+}
+
 void inx() {
     strcpy(last_instr(), "INX");
     inr(X());
@@ -37,6 +45,9 @@ void instrE(unsigned char instr) {
     switch(instr) {
     case 0x5:
         sbc_zp();
+        break;
+    case 0x6:
+        inc_zp();
         break;
     case 0x8:
         inx();

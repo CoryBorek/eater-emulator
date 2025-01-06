@@ -34,6 +34,13 @@ void rora() {
     *A() = ror(*A());
 }
 
+void jmp_ind() {
+    strcpy(last_instr(), "JMP_IND");
+    ADDR addr;
+    ind(&addr);
+    jmp(&addr);
+}
+
 void instr6(unsigned char instr) {
     switch (instr) {
     case 0x0:
@@ -47,6 +54,9 @@ void instr6(unsigned char instr) {
         break;
     case 0xA:
         rora();
+        break;
+    case 0xC:
+        jmp_ind();
         break;
     default:
         unknown();

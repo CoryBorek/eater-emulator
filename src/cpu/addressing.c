@@ -83,7 +83,16 @@ void impl() {
 }
 
 void ind(ADDR * addr) {
-    crash_me();
+    clockn(5);
+    pp();
+    ADDR addr2;
+    addr2.c[0] = bus_read_data(pc()->p);
+    pp();
+    addr2.c[1] = bus_read_data(pc()->p);
+    pp();
+    addr->c[0] = bus_read_data(addr2.p);
+    addr->c[1] = bus_read_data(addr2.p + 1);
+    
 }
 
 void x_ind(ADDR * addr) {

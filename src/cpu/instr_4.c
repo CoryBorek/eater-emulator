@@ -38,6 +38,7 @@ void lsr_a() {
     clockn(2);
     *A() = lsr(*A());
 }
+
 void jmp_abs() {
     strcpy(last_instr(), "JMP_ABS");
     ADDR addr;

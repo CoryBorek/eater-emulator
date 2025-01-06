@@ -6,7 +6,10 @@
 
 #include <string.h>
 
-
+void bcs() {
+    strcpy(last_instr(), "BCS");
+    branch(*C() == 1);
+}
 
 void lda_zpx() {
     strcpy(last_instr(), "LDA_ZPX");
@@ -35,6 +38,9 @@ void lda_ax() {
 
 void instrB(unsigned char instr) {
     switch (instr) {
+    case 0x0:
+        bcs();
+        break;
     case 0x5:
         lda_zpx();
         break;

@@ -4,6 +4,13 @@
 #include <cpu6502.h>
 #include <string.h>
 
+void sta_xind() {
+    strcpy(last_instr(), "STA_XIND");
+    ADDR addr;
+    x_ind(&addr);
+    str(A(), &addr);
+}
+
 void sty_zp() {
     strcpy(last_instr(), "STY_ZP");
     ADDR addr;
@@ -51,6 +58,9 @@ void sta_abs() {
 
 void instr8(unsigned char instr) {
     switch (instr) {
+    case 0x1:
+        sta_xind();
+        break;
     case 0x4:
         sty_zp();
         break;
