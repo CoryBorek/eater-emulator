@@ -13,6 +13,14 @@ void ldy_imm() {
     ldr(Y(), val);
 }
 
+void lda_indx() {
+    strcpy(last_instr(), "LDA_INDX");
+    ADDR addr;
+    x_ind(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    ldr(A(), val);
+}
+
 void ldx_imm() {
     strcpy(last_instr(), "LDX_IMM");
     unsigned char val;
@@ -58,6 +66,9 @@ void instrA(unsigned char instr) {
     switch (instr) {
     case 0x0:
         ldy_imm();
+        break;
+    case 0x1:
+        lda_indx();
         break;
     case 0x2:
         ldx_imm();

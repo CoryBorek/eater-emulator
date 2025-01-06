@@ -87,7 +87,16 @@ void ind(ADDR * addr) {
 }
 
 void x_ind(ADDR * addr) {
-    crash_me();
+    clockn(6);
+    pp();
+    ADDR addr2;
+    addr2.c[0] = bus_read_data(pc()->p);
+    addr2.c[1] = 0x00;
+    addr2.c[0] += *X();
+    pp();
+    addr->c[0] = bus_read_data(addr2.p);
+    addr->c[1] = bus_read_data(addr2.p + 1);
+    
 }
 
 void ind_y(ADDR * addr) {
