@@ -17,6 +17,13 @@ void jsr() {
     pc()->p = addr.p;
 }
 
+void bit_zpg() {
+    strcpy(last_instr(), "BIT_ZPG");
+    ADDR addr;
+    zpg(&addr);
+    bit(bus_read_data(addr.p));
+}
+
 
 void rol_zpg() {
     strcpy(last_instr(), "ROL_ABS");
@@ -54,6 +61,9 @@ void instr2(unsigned char instr) {
     switch (instr) {
     case 0x0:
         jsr();
+        break;
+    case 0x4:
+        bit_zpg();
         break;
     case 0x6:
         rol_zpg();
