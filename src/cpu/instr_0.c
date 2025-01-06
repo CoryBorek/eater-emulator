@@ -4,6 +4,13 @@
 #include <cpu6502.h>
 
 #include <string.h>
+
+void asl_a() {
+    strcpy(last_instr(), "ASL_A");
+    impl();
+    clockn(2);
+    *A() = asl(*A());
+}
 void ora_abs() {
     strcpy(last_instr(), "ORA_ABS");
     ADDR addr;
@@ -13,6 +20,9 @@ void ora_abs() {
 
 void instr0(unsigned char instr) {
     switch (instr) {
+    case 0xA:
+        asl_a();
+        break;
     case 0xD:
         ora_abs();
         break;

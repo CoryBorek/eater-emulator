@@ -32,8 +32,11 @@ void and(unsigned char val) {
 }
 
 unsigned char asl(unsigned char val) {
-    crash_me();
-    return 0;
+    *C() = (val >> 7) & 0b1;
+    val = val << 1;
+    *N() = (val >> 7) & 0b1;
+    *Z() = val == 0 ? 1 : 0;
+    return val;
 }
 
 void bit(unsigned char val) {
