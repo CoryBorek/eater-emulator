@@ -4,12 +4,25 @@
 #include <cpu6502.h>
 #include <string.h>
 
+void sty_zp() {
+    strcpy(last_instr(), "STY_ZP");
+    ADDR addr;
+    zpg(&addr);
+    str(Y(), &addr);
+}
 
 void sta_zp() {
     strcpy(last_instr(), "STA_ZP");
     ADDR addr;
     zpg(&addr);
     str(A(), &addr);
+}
+
+void stx_zp() {
+    strcpy(last_instr(), "STX_ZP");
+    ADDR addr;
+    zpg(&addr);
+    str(X(), &addr);
 }
 
 void dey() {
@@ -38,8 +51,14 @@ void sta_abs() {
 
 void instr8(unsigned char instr) {
     switch (instr) {
+    case 0x4:
+        sty_zp();
+        break;
     case 0x5:
         sta_zp();
+        break;
+    case 0x6:
+        stx_zp();
         break;
     case 0x8:
         dey();
