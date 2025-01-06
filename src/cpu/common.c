@@ -123,8 +123,11 @@ void ldr(unsigned char * reg, unsigned char val) {
 }
 
 unsigned char lsr(unsigned char val) {
-    crash_me();
-    return 0;
+    *C() = val & 0b1;
+    val = val >> 1 & 0b01111111;
+    *N() = 0;
+    *Z() = (val == 0) ? 1 : 0;
+    return val;
 }
 
 void ora(ADDR * addr) {

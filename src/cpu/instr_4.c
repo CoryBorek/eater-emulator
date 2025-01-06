@@ -32,6 +32,12 @@ void eor_imm() {
     eor(val);
 }
 
+void lsr_a() {
+    strcpy(last_instr(), "LSR_A");
+    impl();
+    clockn(2);
+    *A() = lsr(*A());
+}
 void jmp_abs() {
     strcpy(last_instr(), "JMP_ABS");
     ADDR addr;
@@ -49,6 +55,9 @@ void instr4(unsigned char instr) {
         break;
     case 0x9:
         eor_imm();
+        break;
+    case 0xA:
+        lsr_a();
         break;
     case 0xC:
         jmp_abs();
