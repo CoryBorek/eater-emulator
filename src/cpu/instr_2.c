@@ -17,6 +17,16 @@ void jsr() {
     pc()->p = addr.p;
 }
 
+
+void rol_zpg() {
+    strcpy(last_instr(), "ROL_ABS");
+    ADDR addr;
+    zpg(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    val = rol(val);
+    bus_write_data(addr.p, val);
+}
+
 void and_imm() {
     strcpy(last_instr(), "AND_IMM");
     unsigned char val;
@@ -44,6 +54,9 @@ void instr2(unsigned char instr) {
     switch (instr) {
     case 0x0:
         jsr();
+        break;
+    case 0x6:
+        rol_zpg();
         break;
     case 0x9:
         and_imm();
