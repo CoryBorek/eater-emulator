@@ -20,6 +20,14 @@ void ldx_imm() {
     ldr(X(), val);
 }
 
+void lda_zpg() {
+    strcpy(last_instr(), "LDA_ZPG");
+    ADDR addr;
+    zpg(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    ldr(A(), val);
+}
+
 void tay() {
     strcpy(last_instr(), "TAY");
     trr(A(), Y(), 1);
@@ -53,6 +61,9 @@ void instrA(unsigned char instr) {
         break;
     case 0x2:
         ldx_imm();
+        break;
+    case 0x5:
+        lda_zpg();
         break;
     case 0x8:
         tay();

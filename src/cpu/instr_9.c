@@ -9,6 +9,18 @@ void bcc() {
     branch(*C() == 0);
 }
 
+void sta_zpx() {
+    strcpy(last_instr(), "STA_ZPX");
+    ADDR addr;
+    zpg_x(&addr);
+    str(A(), &addr);
+}
+
+void tya() {
+    strcpy(last_instr(), "TYA");
+    trr(Y(), A(), 1);
+}
+
 void sta_y() {
     strcpy(last_instr(), "STA_Y");
     ADDR addr;
@@ -21,15 +33,13 @@ void txs() {
     trr(X(), sp(), 0);
 }
 
-void tya() {
-    strcpy(last_instr(), "TYA");
-    trr(Y(), A(), 1);
-}
-
 void instr9(unsigned char instr) {
     switch (instr) {
     case 0x0:
         bcc();
+        break;
+    case 0x5:
+        sta_zpx();
         break;
     case 0x8:
         tya();
