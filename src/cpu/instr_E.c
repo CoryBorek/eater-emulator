@@ -1,9 +1,18 @@
 #include <cpu/instr_E.h>
+#include <bus.h>
 #include <cpu/addressing.h>
 #include <cpu6502.h>
 #include <cpu/common.h>
 
 #include <string.h>
+
+void sbc_zp() {
+    strcpy(last_instr(), "SBC_ZP");
+    ADDR addr;
+    zpg(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    sbc(val);
+}
 
 void inx() {
     strcpy(last_instr(), "INX");
@@ -26,6 +35,9 @@ void inc_abs() {
 
 void instrE(unsigned char instr) {
     switch(instr) {
+    case 0x5:
+        sbc_zp();
+        break;
     case 0x8:
         inx();
         break;

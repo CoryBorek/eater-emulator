@@ -14,6 +14,14 @@ void cpy_zp() {
     cmp(Y(), val);
 }
 
+void cmp_zp() {
+    strcpy(last_instr(), "CMP_ZP");
+    ADDR addr;
+    zpg(&addr);
+    unsigned char val = bus_read_data(addr.p);
+    cmp(A(), val);
+}
+
 void iny() {
     strcpy(last_instr(), "INY");
     inr(Y());
@@ -35,6 +43,9 @@ void instrC(unsigned char instr) {
     switch (instr) {
     case 0x4:
         cpy_zp();
+        break;
+    case 0x5:
+        cmp_zp();
         break;
     case 0x8:
         iny();
