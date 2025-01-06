@@ -1,5 +1,6 @@
 #include <cpu/instr_3.h>
 #include <cpu/addressing.h>
+#include <cpu/common.h>
 #include <cpu6502.h>
 
 #include <string.h>
@@ -11,10 +12,18 @@ void sec() {
     *C() = 1;
 }
 
+void dec_a() {
+    strcpy(last_instr(), "DEC");
+    der(A());
+}
+
 void instr3(unsigned char instr) {
     switch (instr) {
     case 0x8:
         sec();
+        break;
+    case 0xA:
+        dec_a();
         break;
     default:
         unknown();
