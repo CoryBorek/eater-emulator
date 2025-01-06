@@ -30,7 +30,7 @@ void ldr(unsigned char * reg, unsigned char val);
 
 unsigned char lsr(unsigned char val);
 
-void ora(ADDR * addr);
+void ora(unsigned char val);
 
 void push(unsigned char * reg);
 

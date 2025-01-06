@@ -130,8 +130,7 @@ unsigned char lsr(unsigned char val) {
     return val;
 }
 
-void ora(ADDR * addr) {
-    unsigned char val = bus_read_data(addr->p);
+void ora(unsigned char val) {
     *A() = *A() | val;
     *N() = (*A() >> 7) & 0b1;
     *Z() = *A() == 0 ? 1 : 0;
