@@ -37,7 +37,7 @@ unsigned char asl(unsigned char val) {
 }
 
 void bit(unsigned char val) {
-    *Z() = *A() & val == 0 ? 1 : 0;
+    *Z() = (*A() & val) == 0 ? 1 : 0;
     *N() = (val >> 7) & 0b1;
     *V() = (val >> 6) & 0b1;
 }
@@ -60,7 +60,10 @@ void branch(int check) {
 }
 
 void cmp(unsigned char * reg, unsigned char val) {
-    crash_me();
+    unsigned short test = *reg - val;
+    *N() = (test >> 7) & 0b1;
+    *Z() = (test == 0) ? 1 : 0;
+    *C() = (test >> 8) & 0b1;
 }
 
 void dec(ADDR * addr) {
