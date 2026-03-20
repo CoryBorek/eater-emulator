@@ -1,5 +1,4 @@
-
-.PHONY: all clean pre-bios bios
+.PHONY: all clean pre-bios bios tests
 
 
 all: pre-bios bios

@@ -7,78 +7,89 @@
 #include <string.h>
 #include <stdio.h> // delete later
 void jsr() {
-    strcpy(last_instr(), "JSR");
-    ADDR addr;
-    abs_a(&addr, 3);
-    bus_write_data(0x100 + *sp(), pc()->c[1]);
-    (*sp())--;
-    bus_write_data(0x100 + *sp(), pc()->c[0]);
-    (*sp())--;
-    pc()->p = addr.p;
+  strcpy(last_instr(), "JSR");
+  ADDR addr;
+  abs_a(&addr, 3);
+  bus_write_data(0x100 + *sp(), pc()->c[1]);
+  (*sp())--;
+  bus_write_data(0x100 + *sp(), pc()->c[0]);
+  (*sp())--;
+  pc()->p = addr.p;
 }
 
 void bit_zpg() {
-    strcpy(last_instr(), "BIT_ZPG");
-    ADDR addr;
-    zpg(&addr);
-    bit(bus_read_data(addr.p));
+  strcpy(last_instr(), "BIT_ZPG");
+  ADDR addr;
+  zpg(&addr);
+  bit(bus_read_data(addr.p));
 }
 
 
 void rol_zpg() {
-    strcpy(last_instr(), "ROL_ABS");
-    ADDR addr;
-    zpg(&addr);
-    unsigned char val = bus_read_data(addr.p);
-    val = rol(val);
-    bus_write_data(addr.p, val);
+  strcpy(last_instr(), "ROL_ABS");
+  ADDR addr;
+  zpg(&addr);
+  unsigned char val = bus_read_data(addr.p);
+  val = rol(val);
+  bus_write_data(addr.p, val);
 }
 
 void and_imm() {
-    strcpy(last_instr(), "AND_IMM");
-    unsigned char val;
-    imm(&val);
-    and(val);
+  strcpy(last_instr(), "AND_IMM");
+  unsigned char val;
+  imm(&val);
+  and(val);
+}
+
+void and_abs() {
+  strcpy(last_instr(), "AND_ABS");
+  unsigned char val;
+  ADDR addr;
+  abs_a(&addr, 1);
+  and(addr.p);
 }
 
 void bit_abs() {
-    strcpy(last_instr(), "BIT_ABS");
-    ADDR addr;
-    abs_a(&addr, 1);
-    bit(bus_read_data(addr.p));
+  strcpy(last_instr(), "BIT_ABS");
+  ADDR addr;
+  abs_a(&addr, 1);
+  bit(bus_read_data(addr.p));
 }
 
 void rol_abs() {
-    strcpy(last_instr(), "ROL_ABS");
-    ADDR addr;
-    abs_a(&addr, 3);
-    unsigned char val = bus_read_data(addr.p);
-    val = rol(val);
-    bus_write_data(addr.p, val);
+  strcpy(last_instr(), "ROL_ABS");
+  ADDR addr;
+  abs_a(&addr, 3);
+  unsigned char val = bus_read_data(addr.p);
+  val = rol(val);
+  bus_write_data(addr.p, val);
 }
 
 void instr2(unsigned char instr) {
-    switch (instr) {
-    case 0x0:
-        jsr();
-        break;
-    case 0x4:
-        bit_zpg();
-        break;
-    case 0x6:
-        rol_zpg();
-        break;
-    case 0x9:
-        and_imm();
-        break;
-    case 0xC:
-        bit_abs();
-        break;
-    case 0xE:
-        rol_abs();
-        break;
-    default:
-        unknown();
-        break;
-    }
+  switch (instr) {
+  case 0x0:
+    jsr();
+    break;
+  case 0x4:
+    bit_zpg();
+    break;
+  case 0x6:
+    rol_zpg();
+    break;
+  case 0x9:
+    and_imm();
+    break;
+  case 0xC:
+    bit_abs();
+    break;
+  case 0xD:
+    and_abs();
+    break;
+  case 0xE:
+    rol_abs();
+    break;
+  default:
+    unknown();
+    break;
+  }
 }

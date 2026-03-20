@@ -7,90 +7,101 @@
 #include <stdio.h>
 
 void ldy_imm() {
-    strcpy(last_instr(), "LDY_IMM");
-    unsigned char val;
-    imm(&val);
-    ldr(Y(), val);
+  strcpy(last_instr(), "LDY_IMM");
+  unsigned char val;
+  imm(&val);
+  ldr(Y(), val);
 }
 
 void lda_indx() {
-    strcpy(last_instr(), "LDA_INDX");
-    ADDR addr;
-    x_ind(&addr);
-    unsigned char val = bus_read_data(addr.p);
-    ldr(A(), val);
+  strcpy(last_instr(), "LDA_INDX");
+  ADDR addr;
+  x_ind(&addr);
+  unsigned char val = bus_read_data(addr.p);
+  ldr(A(), val);
 }
 
 void ldx_imm() {
-    strcpy(last_instr(), "LDX_IMM");
-    unsigned char val;
-    imm(&val);
-    ldr(X(), val);
+  strcpy(last_instr(), "LDX_IMM");
+  unsigned char val;
+  imm(&val);
+  ldr(X(), val);
 }
 
 void lda_zpg() {
-    strcpy(last_instr(), "LDA_ZPG");
-    ADDR addr;
-    zpg(&addr);
-    unsigned char val = bus_read_data(addr.p);
-    ldr(A(), val);
+  strcpy(last_instr(), "LDA_ZPG");
+  ADDR addr;
+  zpg(&addr);
+  unsigned char val = bus_read_data(addr.p);
+  ldr(A(), val);
+}
+
+void ldx_zpg() {
+  strcpy(last_instr(), "LDX_ZPG");
+  ADDR addr;
+  zpg(&addr);
+  unsigned char val = bus_read_data(addr.p);
+  ldr(X(), val);
 }
 
 void tay() {
-    strcpy(last_instr(), "TAY");
-    trr(A(), Y(), 1);
+  strcpy(last_instr(), "TAY");
+  trr(A(), Y(), 1);
 }
 
 void lda_imm() {
-    strcpy(last_instr(), "LDA_IMM");
-    unsigned char val;
-    imm(&val);
-    ldr(A(), val);
+  strcpy(last_instr(), "LDA_IMM");
+  unsigned char val;
+  imm(&val);
+  ldr(A(), val);
 }
 
 void tax() {
-    strcpy(last_instr(), "TAX");
-    trr(A(), X(), 1);
+  strcpy(last_instr(), "TAX");
+  trr(A(), X(), 1);
 }
 
 void lda_abs() {
-    strcpy(last_instr(), "LDA_ABS");
-    ADDR addr;
-    abs_a(&addr, 4);
-    unsigned char val = bus_read_data(addr.p);
-    ldr(A(), val);
+  strcpy(last_instr(), "LDA_ABS");
+  ADDR addr;
+  abs_a(&addr, 4);
+  unsigned char val = bus_read_data(addr.p);
+  ldr(A(), val);
 }
 
 void instrA(unsigned char instr) {
     
-    switch (instr) {
-    case 0x0:
-        ldy_imm();
-        break;
-    case 0x1:
-        lda_indx();
-        break;
-    case 0x2:
-        ldx_imm();
-        break;
-    case 0x5:
-        lda_zpg();
-        break;
-    case 0x8:
-        tay();
-        break;
-    case 0x9:
-        lda_imm();
-        break;
-    case 0xA:
-        tax();
-        break;
-    case 0xD:
-        lda_abs();
-        break;
-    default:
-        unknown();
-        break;
-    }
+  switch (instr) {
+  case 0x0:
+    ldy_imm();
+    break;
+  case 0x1:
+    lda_indx();
+    break;
+  case 0x2:
+    ldx_imm();
+    break;
+  case 0x5:
+    lda_zpg();
+    break;
+  case 0x6:
+    ldx_zpg();
+    break;
+  case 0x8:
+    tay();
+    break;
+  case 0x9:
+    lda_imm();
+    break;
+  case 0xA:
+    tax();
+    break;
+  case 0xD:
+    lda_abs();
+    break;
+  default:
+    unknown();
+    break;
+  }
     
 }

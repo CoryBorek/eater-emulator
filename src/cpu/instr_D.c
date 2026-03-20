@@ -5,25 +5,35 @@
 #include <string.h>
 
 void bne() {
-    strcpy(last_instr(), "BNE");
-    branch(*Z() == 0);
+  strcpy(last_instr(), "BNE");
+  branch(*Z() == 0);
 }
 
 void phx() {
-    strcpy(last_instr(), "PHX");
-    push(X());
+  strcpy(last_instr(), "PHX");
+  push(X());
+}
+
+void cld() {
+  strcpy(last_instr(), "CLD");
+  impl();
+  *D() = 0;
+  clockn(2);
 }
 
 void instrD(unsigned char instr) {
-    switch (instr) {
-    case 0x0:
-        bne();
-        break;
-    case 0xA:
-        phx();
-        break;
-    default:
-        unknown();
-        break;
-    }
+  switch (instr) {
+  case 0x0:
+    bne();
+    break;
+  case 0x8:
+    cld();
+    break;
+  case 0xA:
+    phx();
+    break;
+  default:
+    unknown();
+    break;
+  }
 }

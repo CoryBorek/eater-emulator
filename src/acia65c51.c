@@ -261,6 +261,7 @@ unsigned char acia_read(unsigned char reg) {
         acia_status_register |= 0b00010000;
         int bytes;
         ioctl(serial_port, FIONREAD, &bytes);
+	printf("read %d bytes from status register\n", bytes);
         if (bytes > 0) {
             acia_status_register |= 0b00001000;
         } else {

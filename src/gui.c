@@ -22,7 +22,7 @@ void display_center(int yy, char * str)
   x = (x - strlen(str))/2;
 
   // Write the string to the window
-  mvwprintw(stdscr, y, x, str);
+  mvwprintw(stdscr, y, x, "%s", str);
 
   // Make sure the screen is updated
   refresh();

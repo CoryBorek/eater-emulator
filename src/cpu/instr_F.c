@@ -6,25 +6,35 @@
 #include <string.h>
 
 void beq() {
-    strcpy(last_instr(), "BEQ");
-    branch(*Z() == 1);
+  strcpy(last_instr(), "BEQ");
+  branch(*Z() == 1);
+}
+
+void sed() {
+  strcpy(last_instr(), "SED");
+  impl();
+  *B() = 1;
+  clockn(2);
 }
 
 void plx() {
-    strcpy(last_instr(), "PLX");
-    pull(X());
+  strcpy(last_instr(), "PLX");
+  pull(X());
 }
 
 void instrF(unsigned char instr) {
-    switch (instr) {
-    case 0x0:
-        beq();
-        break;
-    case 0xA:
-        plx();
-        break;
-    default:
-        unknown();
-    }
+  switch (instr) {
+  case 0x0:
+    beq();
+    break;
+  case 0x8:
+    sed();
+    break;
+  case 0xA:
+    plx();
+    break;
+  default:
+    unknown();
+  }
 
 }
